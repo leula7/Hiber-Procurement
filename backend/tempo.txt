@@ -1,0 +1,150 @@
+
+import mysql from "mysql";
+import cors from "cors";
+import express from 'express';
+import bodyParser from 'body-parser';
+import md5 from "md5";
+import fs from fs;
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+const file = fs.readFileSync('C:/Users/leulk/Desktop/Impo_File/javaAss.pdf');
+
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "userdata",
+  });
+
+    app.post('/upload',(req,res)=>{
+        const {user_id,file} = req.body;
+        const {file_name,file_type,data} = file;
+        const uploading = "insert into files values('',?,?,?)";
+        db.query(uploading,[user_id,file_name,file_type],(err,result)=>{
+            if(err){
+                console.log(err);
+                res.status(500).send('Error uploading file')
+            }else{
+                const fileId = result.in
+            }
+        })
+    })
+
+
+
+
+
+import mysql from "mysql";
+import cors from "cors";
+import express from 'express';
+import bodyParser from 'body-parser';
+import md5 from "md5";
+import fs from fs;
+import multer from multer;
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "userdata",
+  });
+
+  const storage = multer.diskStorage({
+    destination: (req,file,callback)=>{
+        const uploadpath = path.join(__dirname,'upload');
+        callback(null,uploadpath);
+    },
+    file_name: (req,file,callback)=>{
+        const file_name = Date.now()+'-'+file.originalname;
+        callback(null,file_name);
+    }
+  });
+  const upload = multer({storage: storage});
+
+  app.post('/upload',upload.single('file'),(req,res,next)=>{
+    const file = req.file;
+    if(!file){
+        const error = new Error('NO File Uploadd');
+        error.status = 400;
+        return next(error);
+    }
+  })
+
+
+
+
+
+   const filepath = req.body.filepath;
+  const fileName = path.basename(filepath);
+  const extension = path.extname(filepath);
+  const timestamp = Date.now();
+  const user_id = req.body.user_id;
+
+  const uniqueFilename  = `${user_id}_${timestamp}_${fileName}.${extension}`;
+  const uploadfile = "insert into files values('',?,?,?)";
+ fs.readFile(filepath,(err,data)=>{
+  if(err){
+      console.log(err);
+      return;
+  }
+   fs.writeFile(`./uploads/${uniqueFilename}`,data,(err)=>{
+      if(err){
+          console.error(err);
+          res.status(500).send('Failed to Upload');
+          return;
+      }else{
+
+      }
+    });
+    db.query(uploadfile,[user_id,fileName,extension],(err,result)=>{
+      if(err) throw err;
+      if(result.affectedRows > 0){
+        res.json({message: 'upload success'})
+      }
+    });
+});
+
+
+
+
+ //Take input from the user
+   // const fileName = req.body.fileName;
+   // const username = req.body.username;
+   // const user_id = req.body.user_id;
+   // const fileType = req.body.fileType;
+   // const data = req.body.filedata;
+  // const data = Buffer.from(filedata.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
+   
+ //   console.log("File: "+fileName+"   "+fileType)
+ 
+ //   //Orgainzing the Uploaded File
+ //  // const fileName = path.basename(filepath);
+ //   // const extension = path.extname(filepath);
+ //   const timestamp = Date.now();
+  
+ //   const uniqueFilename  = `${user_id}_${timestamp}_${fileName}`;
+ //   const uploadfile = "insert into files values('',?,?,?)";
+  
+ //   fs.writeFile(`./uploads/${username}/${uniqueFilename}`, data, (err) => {
+ //     if (err) throw err;
+ //     enterData();
+ //   });
+ 
+   // if (fs.existsSync(filepath)) {
+   //   fs.readFile(filepath, (err, data) => {
+   //     if (err) throw err;
+      
+   //   });
+   // }else{
+   //   // The file doesn't exist at the specified path
+   //   res.json({message: 'File not found.'})
+   // }
+ 
