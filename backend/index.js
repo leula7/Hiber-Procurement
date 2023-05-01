@@ -39,17 +39,8 @@ return res.json({
 next(err);
 });
 
-<<<<<<< HEAD
 //General 
 app.use('/', General);
-=======
-app.get("/", (req, res) => {
-  res.json("hello");
-});
-app.get("/greet", (req, res) => {
-  res.json("My Greeting");
-});
->>>>>>> 7b0bc7f34190bf1af84adaa6695845e06ecd431a
 
 //Chat
 app.use('/', Chat);
