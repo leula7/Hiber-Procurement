@@ -24,6 +24,7 @@ export const getProducts = async (req,res) => {
         res.status(40).json({ message:error.message})
     }
 } 
+
 export const getCustomers = async (req, res) => {
     try {
       const customers = await User.find({ role: "user" }).select("-password");
