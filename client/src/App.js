@@ -4,11 +4,11 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { themeSettings } from "theme";
-import Layout from "pages/layout/Layout.component";
-import Dashboard  from "pages/dashboard/Dashboard.component";
-import Products from "pages/products/products.component";
-import Customers from"pages/customers/customers.component";
-import Transaction from "pages/transaction/transaction.component.jsx"
+import Layout from "scenes/layout/Layout.component";
+import Dashboard  from "scenes/dashboard/Dashboard.component";
+import Products from "scenes/products/products.component";
+import Customers from"scenes/customers/customers.component";
+import Transaction from "scenes/transaction/transaction.component.jsx"
 
 function App() {
   const mode = useSelector((state) => state.global.mode);
