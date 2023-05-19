@@ -10,52 +10,74 @@ import { useEffect, useState } from 'react';
 import { useLocation,useNavigate } from 'react-router-dom';
 import FlexBetween from './FlexBetween';
 import hibre from '../assets/Hibret-bank-logo.jpg'
+import { useSelector } from 'react-redux';
 
-const navItems = [
-  {
-    text: "Dashboard",
-    icon: <HomeOutlined />,
-  },
-  {
-    text: "Client Facing",
+const navItems = {
+  a:[
+    {
+      text: "Dashboard",
+      icon: <HomeOutlined />,
+    },
+    {
+      text: "RequestsForm",
+      icon: <ReceiptLongOutlined />,
+    },
+     {
+    text: "report",
     icon: null,
-  },
-  {
-    text: "Task",
-    icon: <AssignmentOutlined />,
-  }, 
-  {
-    text: "Supplier",
-    icon: <Groups2Outlined />,
   },
   {
     text: "Requests",
     icon: <ReceiptLongOutlined />,
   },
-  {
-    text: "Products",
-    icon: <BallotOutlined />,
-  },
- 
-  
-  {
-    text: "Unit price",
-    icon: <PriceCheckOutlined />,
-  },
-  {
-    text: "Managment",
-    icon: null,
-  },
-  {
+  ],
+  m:[
+    {
+      text: "Dashboard",
+      icon: <HomeOutlined />,
+    },
+    {
+      text: "Requests",
+      icon: <ReceiptLongOutlined />,
+    },
+  ],
+  o:[
+    {
+      text: "Dashboard",
+      icon: <HomeOutlined />,
+    },
+    {
+      text: "Task",
+      icon: <AssignmentOutlined />,
+    }, 
+     {
+    text: "Supplier",
+    icon: <Groups2Outlined />,
+    },
+     {
+    text: "Requests",
+    icon: <ReceiptLongOutlined />,
+    },
+    {
+      text: "Unit price",
+      icon: <PriceCheckOutlined />,
+    },
+    {
+      text: "Managment",
+      icon: null,
+    },
+    {
     text: "onGoing",
     icon: <PointOfSaleOutlined />,
-  },
-  {
+    },
+    {
     text: "History",
     icon: <TodayOutlined />,
-  },
-];
-
+   },
+  ]
+  
+}
+  
 const SideBar = ({
   user,
   drawerWidth,
@@ -63,6 +85,7 @@ const SideBar = ({
   setIsSidebarOpen,
   isNonMobile,
 }) => {
+  const userr = useSelector((state) => state.auth.user);
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
   const navigate = useNavigate();
@@ -116,7 +139,7 @@ const SideBar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {navItems[userr.password].map(({ text, icon }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>

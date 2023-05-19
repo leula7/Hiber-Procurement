@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useGetTransactionsQuery } from "state/api";
 import Header from "components/Header";
 // import DataGridCustomToolbar from "components/DataGridCustomToolbar";
@@ -98,10 +98,8 @@ const Transactions = () => {
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-        //   components={{ Toolbar: DataGridCustomToolbar }}
-        //   componentsProps={{
-        //     toolbar: { searchInput, setSearchInput, setSearch },
-        //   }}
+          slots={{ toolbar: GridToolbar }}
+       
         />
       </Box>
     </Box>

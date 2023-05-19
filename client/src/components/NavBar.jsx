@@ -23,10 +23,19 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import {logout} from 'state/authSlice';
+import { useNavigate } from "react-router-dom";
+
 
 const NavBar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  const logoutHandler= ()=>{
+    dispatch(logout());
+    navigate("/");
+  }
 
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
@@ -115,7 +124,7 @@ const NavBar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 onClose={handleClose}
                 anchorOrigin={{vertical:'bottom', horizontal: 'center'}}
                 >
-                  <MenuItem onClick={handleClose}>Log Out</MenuItem>
+                  <MenuItem onClick={logoutHandler}>Log Out</MenuItem>
                   </Menu>
           </FlexBetween>
         </FlexBetween>
