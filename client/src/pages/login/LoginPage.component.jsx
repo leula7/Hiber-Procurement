@@ -1,107 +1,52 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { login } from "state/authSlice"; // Update the import path accordingly
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import hiber from  "assets/Hibret-bank-logo.jpg"
+import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
+import Form from "./Form";
+import FlexBetween from "components/FlexBetween";
+import hibre from 'assets/Hibret-bank-logo.jpg'
+
 
 const LoginPage = () => {
-  const dispatch = useDispatch();
-
-  const handleLogin = () => {
-    dispatch(login()); // Dispatch the login action
-  };
-
-  const initialValues = {
-    email: "",
-    password: "",
-  };
-
-  const checkoutSchema = yup.object().shape({
-    password: yup.string().required("required"),
-    email: yup.string().email("invalid email").required("required")
-  });
-  
-  const handleSubmit = (values) => {
-    dispatch(login(values)); 
-    }
-
+  const theme = useTheme();
+  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   return (
-    <Box display="flex" justifyContent="center" >
-      <Box width="40%" height="30%" mt="300px" >
-        <Box align="center" >
-            <Box 
+    <Box  width="100%"  height="100%" backgroundColor={theme.palette.background.paper}>
+      <Box
+        width="100%"
+        backgroundColor={theme.palette.background.default}
+        p="1rem 6%"
+        textAlign="center"
+      >
+        <FlexBetween marginLeft="30%" color={theme.palette.secondary.default}>
+                <Box  justifyContent="space-around" display="flex" alignItems="center" gap="0.5rem">
+                  <Box 
                 component="img"
                 alt="profile"
-                src={hiber}
-                height="92px"
-                width="92px"
-                borderRadius="30%"
-                sx={{ objectFit: "cover" }} />
-        </Box>
-        
-        <Typography variant="h3" align="center" margin="30px">
-            Login 
+                src={hibre}
+                height="52px"
+                width="52px"
+                borderRadius="50%"
+                sx={{ objectFit: "cover" }}
+              />
+        <Typography fontWeight="bold" fontSize="32px" >
+          Hiber Procurnment
         </Typography>
-      <Formik
-        onSubmit={handleSubmit}
-        initialValues={initialValues}
-        validationSchema={checkoutSchema}
+        </Box>
+        </FlexBetween>
+      </Box>
+
+      <Box
+        width={isNonMobileScreens ? "50%" : "93%"}
+        p="2rem"
+        m="2rem auto"
+        borderRadius="1.5rem"
+        backgroundColor={theme.palette.background.default}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <Box
-              display="block"
-            >
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Email"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.email}
-                name="email"
-                error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="password"
-                label="password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.lastName}
-                name="password"
-                error={!!touched.password && !!errors.password}
-                helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 2" }}
-              />
-            </Box>
-            <Box display="flex" justifyContent="center" mt="20px" gap="1rem">
-            {/* <Button  color="secondary" variant="contained"  onClick={handleFormReset}>
-                Reset Fields
-              </Button> */}
-              <Button type="submit" color="primary" variant="contained">
-                Login
-              </Button>
-            </Box>
-          </form>
-        )}
-      </Formik>
+        <Typography align="center" fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
+          Welcome to Hiber!
+        </Typography>
+        <Form />
+      </Box>
     </Box>
-    </Box>
-      
   );
-            }
+};
+
 export default LoginPage;

@@ -1,12 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { useGetCustomersQuery } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 const Customers = () => {
   const theme = useTheme();
   const { data, isLoading } = useGetCustomersQuery();
+  const [open, setOpen] = useState(true);
+  
+const [selectedRow, setSelectedRow] = useState(null);
+const handleRowSelection = (params) => {
+  setSelectedRow(params.row);
+  setOpen(true);
+};
+const handleAccept = () => {
+  // Implement your accept logic here
+  setOpen(false);
+};
+const handleReject = () => {
+  // Implement your reject logic here
+  setOpen(false);
+};
+
+
   console.log("data", data);
 
   const columns = [
@@ -86,8 +104,26 @@ const Customers = () => {
           getRowId={(row) => row._id}
           rows={data || []}
           columns={columns}
+          onRowClick={handleRowSelection}
         />
       </Box>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Row Details</DialogTitle>
+        <DialogContent>
+          {/* Display the row details in the dialog */}
+          <p>ID: {selectedRow?.id}</p>
+          <p>Name: {selectedRow?.name}</p>
+          {/* Add more row details as needed */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAccept} variant="contained" color="primary">
+            Accept
+          </Button>
+          <Button onClick={handleReject} variant="contained" color="secondary">
+            Reject
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

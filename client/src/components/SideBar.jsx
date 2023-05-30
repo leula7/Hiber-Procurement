@@ -12,8 +12,9 @@ import FlexBetween from './FlexBetween';
 import hibre from '../assets/Hibret-bank-logo.jpg'
 import { useSelector } from 'react-redux';
 
+
 const navItems = {
-  a:[
+  assistant:[
     {
       text: "Dashboard",
       icon: <HomeOutlined />,
@@ -30,8 +31,12 @@ const navItems = {
     text: "Requests",
     icon: <ReceiptLongOutlined />,
   },
+  {
+    text: "Table",
+    icon: <ReceiptLongOutlined />,
+  }
   ],
-  m:[
+  manager:[
     {
       text: "Dashboard",
       icon: <HomeOutlined />,
@@ -41,7 +46,7 @@ const navItems = {
       icon: <ReceiptLongOutlined />,
     },
   ],
-  o:[
+  officer:[
     {
       text: "Dashboard",
       icon: <HomeOutlined />,
@@ -85,7 +90,11 @@ const SideBar = ({
   setIsSidebarOpen,
   isNonMobile,
 }) => {
-  const userr = useSelector((state) => state.auth.user);
+  // const userr = useSelector((state) => state.auth.user);
+  const userr ={
+    username:"jack",
+    position:"assistant"
+  }
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
   const navigate = useNavigate();
@@ -139,7 +148,7 @@ const SideBar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems[userr.password].map(({ text, icon }) => {
+              {navItems[userr.position].map(({ text, icon }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>

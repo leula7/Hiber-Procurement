@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { useGetTransactionsQuery } from "state/api";
+import { useGetRequestQuery } from "state/api";
 import Header from "components/Header";
+import { useSelector } from "react-redux";
 // import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 
 const Transactions = () => {
@@ -13,14 +14,18 @@ const Transactions = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
-
+  const user = useSelector((state)=> state.auth.user);
+  const id=user._id;
   const [searchInput, setSearchInput] = useState("");
-  const { data, isLoading } = useGetTransactionsQuery({
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search,
-  });
+  const { data, isLoading } = useGetRequestQuery(id
+    //{
+    // page,
+    // pageSize,
+    // sort: JSON.stringify(sort),
+    // search,
+  //}
+  );
+  console.log(data);
 
   const columns = [
     {
@@ -29,7 +34,7 @@ const Transactions = () => {
       flex: 1,
     },
     {
-      field: "userId",
+      field: "",
       headerName: "User ID",
       flex: 1,
     },
@@ -86,13 +91,13 @@ const Transactions = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={(data && data.transactions) || []}
+          rows={data  || []}
           columns={columns}
-          rowCount={(data && data.total) || 0}
+          rowCount={data || 0}
           rowsPerPageOptions={[20, 50, 100]}
           pagination
-          page={page}
-          pageSize={pageSize}
+          // page={page}
+          // pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
           onPageChange={(newPage) => setPage(newPage)}

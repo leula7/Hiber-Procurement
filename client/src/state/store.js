@@ -1,24 +1,25 @@
 import { configureStore} from "@reduxjs/toolkit";
-import { persistReducer, persistStore } from "redux-persist";
+import { persistReducer, persistStore,FLUSH,REHYDRATE,PAUSE,PERSIST,
+  PURGE, REGISTER, } from "redux-persist";
 import storage from "redux-persist/lib/storage"; 
-import globalReducer from 'state/state';
 import {api} from "state/api"
-import authReducer  from 'state/authSlice';
+import authReducer  from 'state/state';
 
 const persistConfig = {
     key: "root",
     storage,
-    // Add any other configuration options you need
   };
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
 const store = configureStore ({
   reducer : {
-    global: globalReducer,
     auth: persistedAuthReducer,
     [api.reducerPath] : api.reducer,
   },
-  middleware: (getDefault) => getDefault().concat(api.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    },}).concat(api.middleware),
 });
 
 export const persistor = persistStore(store);

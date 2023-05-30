@@ -8,8 +8,8 @@ import {
   ArrowDropDownOutlined,
 } from "@mui/icons-material";
 import FlexBetween from "./FlexBetween";
-import { useDispatch } from "react-redux";
-import { setMode } from "state/state";
+import { useDispatch, useSelector } from "react-redux";
+import { setMode, setLogout} from "state/state";
 import ProfileImage from "../assets/profile.jpeg";
 import {
   useTheme,
@@ -23,17 +23,21 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import {logout} from 'state/authSlice';
 import { useNavigate } from "react-router-dom";
 
 
-const NavBar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
+const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
+  // const user = useSelector((state)=> state.auth.user)
+  const user ={
+    username:"jack",
+    position:"spartacus"
+  }
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
-
+  // const name = `${user.firstName} ${user.lastName}`
   const logoutHandler= ()=>{
-    dispatch(logout());
+    dispatch(setLogout());
     navigate("/");
   }
 
@@ -106,13 +110,13 @@ const NavBar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 fontSize="0.8rem"
                 sx={{ color: theme.palette.secondary[100] }}
               >
-                {user.name}
+                {user.username}
               </Typography>
               <Typography
                 fontSize="0.75rem"
                 sx={{ color: theme.palette.secondary[200] }}
               >
-                {user.occupation}
+                {user.position}
               </Typography>
             </Box>
             <ArrowDropDownOutlined
