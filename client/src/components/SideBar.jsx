@@ -34,7 +34,12 @@ const navItems = {
   {
     text: "Table",
     icon: <ReceiptLongOutlined />,
-  }
+  },
+  {
+    text: "TenderCard",
+    icon: <ReceiptLongOutlined />,
+  },
+ 
   ],
   manager:[
     {

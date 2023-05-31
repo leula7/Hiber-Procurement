@@ -12,6 +12,7 @@ import Transaction from "pages/transaction/transaction.component.jsx"
 import LoginPage from "pages/login/LoginPage.component";
 import RequestForm from "pages/RequestForm/RequestForm.component";
 import Table from "pages/Table/Table";
+import TenderCard from "pages/TenderShowing.page";
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/requests" element={<Transaction />} />
                 <Route path="/requestsform" element={<RequestForm />} />
                 <Route path="/table" element={<Table />} />
+                <Route path="/tendercard" element={<TenderCard />} />
 
               </Route>
             
