@@ -333,3 +333,44 @@ export const generatedocument = async(req,res)=>{
       res.json({ message: error.message });
     }
   };
+
+  export const generateProposal = async (req, res) => {
+    const user_id = req.body.user_id;
+    
+    const propos = `INSERT INTO proposal (user_id, cat_id, total_price)
+    SELECT ${user_id},subquery.cat_id,subquery.total_price
+FROM (
+  SELECT c.cat_id, c.cata_Name, SUM(ar.quantity * i.price) AS total_price
+  FROM filter_needs fn
+  LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+  LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
+  LEFT JOIN item i ON i.item_id = ar.item_id
+  LEFT JOIN catagory c ON c.cat_id = i.cat_id
+  WHERE i.cat_id = c.cat_id
+  GROUP BY c.cat_id, c.cata_Name
+
+  UNION
+
+  SELECT c.cat_id, c.cata_Name, SUM(rp.quantity * i.price) AS total_price
+  FROM filter_needs fn
+  LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+  LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
+  LEFT JOIN item i ON i.item_id = rp.item_id
+  LEFT JOIN catagory c ON c.cat_id = i.cat_id
+  WHERE i.cat_id = c.cat_id
+  GROUP BY c.cat_id, c.cata_Name
+) AS subquery
+GROUP BY subquery.cat_id, subquery.cata_Name
+LIMIT 0, 25;`;
+  
+    try {
+      await sequelize.query(propos, {
+        type: Sequelize.QueryTypes.INSERT,
+      });
+  
+      res.json({ message: 'Insertion successful' });
+    } catch (error) {
+      res.json({ message: error.message });
+    }
+  };
+  

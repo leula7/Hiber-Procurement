@@ -3,16 +3,19 @@ import  jwt  from "jsonwebtoken";
 import path from "path";
 import { expressjwt } from "express-jwt";
 import md5 from "md5";
+import dotenv from 'dotenv';
 
+
+dotenv.config({path: 'connections.env'});
 const secret =process.env.ACCESS_TOKEN_SECRET;
-const protect= expressjwt({ secret: secret,algorithms: ['HS256'] });
+const protect= expressjwt({ secret: secret?process.env.ACCESS_TOKEN_SECRET:"akdjflkadajsfkdjsfkladsjlfkjdalskfjaklds",algorithms: ['HS256'] });
 
     export const AuthLogin = async (req, res) => {
         try {
-        const { username, position } = req.body;
+        const { username } = req.body;
         const password = md5(req.body.password);
 
-        if (!username || !password || !position) {
+        if (!username || !password) {
             return res.json({
             "user": {},
             "error": "400",
@@ -23,26 +26,6 @@ const protect= expressjwt({ secret: secret,algorithms: ['HS256'] });
         let user;
         let includeBranch = false;
 
-        if (position === 'concerned') {
-            user = await User.findOne({
-            attributes: ['user_id', 'position', 'branch_id', 'username'],
-            where: {
-                username,
-                password,
-                position
-            }
-            });
-            
-            includeBranch = true;
-        } else if (position === 'supplier') {
-            user = await Supplier.findOne({
-            attributes: ['supplier_id', 'tin_number', 'username'],
-            where: {
-                username,
-                password
-            }
-            });
-        }else{
             user = await User.findOne({
             attributes: ['user_id', 'position', 'username'],
             where: {
@@ -50,13 +33,12 @@ const protect= expressjwt({ secret: secret,algorithms: ['HS256'] });
                 password
             }
             });
-        }
 
         if (user) {
             const token = jwt.sign({
             user_id: user.user_id,
             username: user.username,
-            position: user.position
+            "position": user.position
             }, secret, { expiresIn: '1min', algorithm: 'HS256' });
 
             let branch = {};
@@ -76,14 +58,13 @@ const protect= expressjwt({ secret: secret,algorithms: ['HS256'] });
 
             res.json({
                 user_id: user.user_id,
-                position: user.position,
+                "position": user.position,
                 username: user.username,
                 branch_name: branch.branch_name,
                 Branch_id: branch.branch_id,
-                position,
-            "error": "200",
-            "message": "Login Success",
-            token
+                "error": "200",
+                "message": "Login Success",
+                token
             });
 
             console.log("Login Success");

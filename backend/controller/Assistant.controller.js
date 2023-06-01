@@ -3,15 +3,17 @@ import sequelize from '../connection/database.js';
 
 export const requests = async (req, res, next) => {
     try {
-      const { user_id, type, item_id, quantity, time_of_purchase, title_of_post, 
+      const { user_id, table, item_id, quantity, time_of_purchase, title_of_post, 
         other_reason, tag_no, service_year, frequency_of_rep, book_value } = req.body;
+        console.log(req.body);
       let model;
-      if (type === 'replacement') {
+      console.log("tables : ",table);
+      if (table === 'replacement') {
         model = ReplacementRequest;
-      } else if (type === 'additional_request') {
+      } else if (table === 'additional_request') {
         model = AdditionalRequest;
       } else {
-        throw new Error(`Invalid table type: ${type}`);
+        throw new Error(`Invalid table type: ${table}`);
       }
 
       const request = await model.create({
@@ -30,7 +32,8 @@ export const requests = async (req, res, next) => {
       });
 
       res.status(200).send({
-        message: `Successfully created ${type} request with ID ${request.id}`,
+        message: `Successfully created ${table} request with ID ${request.id}`,
+        error: "200",
         request_id: request.id,
       });
     } catch (error) {
@@ -42,9 +45,11 @@ export const requests = async (req, res, next) => {
     }
 }
 
+
 export const approveRequest = async (req, res) => {
   try {
-        const Assistant_id = req.params.user_id;
+        let Assistant_id = req.params.user_id;
+        Assistant_id = 1;
         const result = await sequelize.query(`
           SELECT ra.req_id AS request_id, 
           b.branch_name, b.branch_id, u.user_id, i.item_name, 

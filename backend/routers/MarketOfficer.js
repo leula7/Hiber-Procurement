@@ -1,7 +1,8 @@
 import {Router} from 'express';
-import { filter_documnet, filterdata, filtered_data, generateBid, generatedocument, 
+import { filter_documnet, filterdata, filtered_data, generateBid, generateProposal, generatedocument, 
   quarterPrice, setprice, techDoc, technical_documnets, 
   updateCatagory, updateItem } from '../controller/MarketOfficer.controller.js';
+
 
 const router = Router();
 
@@ -27,5 +28,7 @@ const router = Router();
   router.get("/filterd-data/:cat_id",filtered_data);
 
   router.get("/filter-document",filter_documnet);
+
+  router.post("/generateproposal",generateProposal);
   
   export default router;

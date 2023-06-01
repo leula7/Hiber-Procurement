@@ -11,6 +11,10 @@ id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  time_of_purchase: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   item_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -32,7 +36,7 @@ id: {
     allowNull: false,
   },
   book_value: {
-    type: DataTypes.STRING,
+    type: DataTypes.FLOAT,
     allowNull: false,
   },
 },{
@@ -40,8 +44,8 @@ id: {
   timestamps: false
 });
 
-const AdditionalRequest = sequelize.define('additional_request', {
-id: {
+const AdditionalRequest = sequelize.define('add_req', {
+add_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
@@ -59,7 +63,7 @@ id: {
     allowNull: false,
   },
   time_of_purchase: {
-    type: DataTypes.DATE,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   title_of_post: {
