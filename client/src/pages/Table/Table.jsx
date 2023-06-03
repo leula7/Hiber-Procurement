@@ -1,4 +1,4 @@
-import React ,{ useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { useGetCustomersQuery } from "state/api";
 import Header from "components/Header";
@@ -7,79 +7,69 @@ import TableIcon from "components/TableIcon";
 import DialogView from "components/DialogView";
 import EditDialog from "components/EditDialog";
 import DeleteDialog from "components/DeleteDialog";
-
+import { approves } from "api/Assistant";
+import { useSelector } from "react-redux";
 
 const Table = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-//   const { data, isLoading } = useGetCustomersQuery();
-const handleRowSelection = (params) => {
-  setSelectedRow(params.row);
-  setOpenDeleteDialog(true);
-};
-const handleAccept = () => {
-  // Implement your accept logic here
-  setOpen(false);
-};
-const handleReject = () => {
-  // Implement your reject logic here
-  setOpen(false);
-};
-const handleSave = (editedData) => {
-  // Update the row data or perform save logic
-  console.log('Edited data:', editedData);
-};
-const handleDelete = () => {
-  // Delete the row logic
-  setOpenDeleteDialog(true);
-};
-const handleDeleteConfirm = () => {
-  // Delete the row logic
-  console.log('Deleting row:', selectedRow);
-  setOpenDeleteDialog(false);
-};
-const data = [{
-    id:1,
-    name:"esepe",
-    email:'mu"j"ij'
-},
-{
-    id:2,
-    name:"zeborte",
-    email:'mu"j"ij'
+  const user = useSelector((state) => state.auth.user);
+  const [requests, setRequests] = useState([]);
+  const [columns, setColumns] = useState([]);
 
-}]
-  console.log(data);
-
-  const columns = [
-    {
-      field: "id",
-      headerName: "ID",
-      flex: 1,
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 0.5,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-    }
-    ,
-    {
-        field: "actions",
-        headerName: "Actions",
-       type:'actions',
-       width:150,
-       renderCell: (params) =>(
-        <TableIcon handledelete={handleDelete} {...{params}} />
-       )
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const approved = await approves(user.user_id);
+        setRequests(approved.data.approved);
+        setColumns([
+          { field: "request_id", headerName: "Request ID", flex: 1 },
+          { field: "branch_name", headerName: "Branch Name", flex: 1 },
+          { field: "user_id", headerName: "User ID", flex: 1 },
+          {
+            field: "actions",
+            headerName: "Actions",
+            type: "actions",
+            width: 150,
+            renderCell: (params) => (
+              <TableIcon handledelete={handleDelete} {...params} />
+            ),
+          },
+        ]);
+      } catch (error) {
+        console.error(error);
       }
-  ];
+    };
+    fetchData();
+  }, [user.user_id]);
+
+  const handleRowSelection = (params) => {
+    // setSelectedRow(params.row);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleAccept = () => {
+    setOpen(false);
+  };
+
+  const handleReject = () => {
+    setOpen(false);
+  };
+
+  const handleSave = (editedData) => {
+    console.log("Edited data:", editedData);
+  };
+
+  const handleDelete = () => {
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    console.log("Deleting row:", selectedRow);
+    setOpenDeleteDialog(false);
+  };
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -113,31 +103,22 @@ const data = [{
         }}
       >
         <DataGrid
-        //   loading={isLoading || !data}
-          getRowId={(row) => row.id}
-          rows={data || []}
+          getRowId={(row) => row.request_id} 
+          rows={requests}
           columns={columns}
           onRowClick={handleRowSelection}
         />
-       {/* <DialogView
-        open={open}
-        onClose={() => setOpen(false)}
-        row={selectedRow}
-        onAccept={handleAccept}
-        onReject={handleReject}
-      /> */}
-      {/* <EditDialog
-        open={open}
-        onClose={() => setOpen(false)}
-        rowData={selectedRow}
-        onSave={handleSave}
-      /> */}
-       <DeleteDialog
-        open={openDeleteDialog}
+        {/* <DeleteDialog
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          onDelete={handleDeleteConfirm}
+        /> */}
+        <DialogView 
+        open={ openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
-        onDelete={handleDeleteConfirm}
-      />
-    </Box>
+
+         />
+      </Box>
     </Box>
   );
 };

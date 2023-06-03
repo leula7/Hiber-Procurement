@@ -39,12 +39,15 @@ const Form = () => {
       console.log(values)
       const result = await login(values);
       const loggedInUser = result.data; // Retrieve the data property
+      console.log("User: ",loggedInUser)
       if (loggedInUser) {
-        toast.success('Login successful!');
-        dispatch( setLogin({
-          user: loggedInUser,
-          token: loggedInUser.token,
-        }))
+        if(loggedInUser.error == "200"){
+          toast.success('Login successful!');
+          dispatch( setLogin({
+            user: loggedInUser,
+            token: loggedInUser.token,
+          }));
+        }
         navigate('/');
       } else {
         toast.error('Invalid username or password!');

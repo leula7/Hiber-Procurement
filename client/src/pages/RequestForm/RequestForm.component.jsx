@@ -16,18 +16,18 @@ const RequestForm = () => {
   const [replacement, setReplacement] = useState(false);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [request, { isLoading, isError }] = useRequestMutation();
-  const user = useSelector((state)=> state.auth.user)
+  const user = useSelector((state)=> state.auth.user);
 
   const handleRepacementFormSubmit = async (values) => {
     
     try {
-         const id = user._id;
-         values.id=id;
-         console.log(values)
+         values.user_id = user.user_id;
+         values.table="replacement";
+         console.log("balues: ",values)
       const response  = await request(values);
-      const r = response.data; // Retrieve the data property
-      console.log(request)
-      if (r) {
+      const error = response.data.error;
+      console.log(error);
+      if (error == "200") {
         toast.success(' successfully Requested!');
       } else {
         toast.error('error requesting');
@@ -45,15 +45,12 @@ const RequestForm = () => {
 
   const handleAdditionalFormSubmit = async (values) => {
     try {
-      const id = user.user_id;
-      values.user_id=id;
+      values.user_id = user.user_id;
       values.table="additional_request";
-      values.item_id=1
       console.log(values)
    const response  = await request(values);
-   const r = response.data.requested_id; // Retrieve the data property
-   console.log(request)
-   if (r) {
+   const error = response.data.error;
+   if (error == "200") {
      toast.success(' successfully Requested!');
    } else {
      toast.error('error requesting');

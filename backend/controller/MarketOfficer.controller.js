@@ -3,6 +3,7 @@ import sequelize from '../connection/database.js';
 import Item from '../model/MarketOfficer/SetItem.model.js';
 import { Bid } from '../model/MarketOfficer/bid.model.js';
 import Category from '../model/MarketOfficer/updateCatagory.model.js';
+import GenBid from '../model/MarketOfficer/GenerateBid.model.js';
 
 export const generatedocument = async(req,res)=>{
   const getDocument = `
@@ -373,4 +374,58 @@ LIMIT 0, 25;`;
       res.json({ message: error.message });
     }
   };
+
+  export const getTasks = async (req, res) => {
+    const user_id = req.body.user_id;
+    
+    const tasks = `select * from task where status = 0 and emp_id = ${user_id}`;
   
+    try {
+      const result =await sequelize.query(tasks, {
+        type: Sequelize.QueryTypes.SELECT,
+      });
+  
+      res.json(result);
+    } catch (error) {
+      res.json({ message: error.message });
+    }
+  };
+
+  export const doneTasks = async (req, res) => {
+    const user_id = req.body.user_id;
+    
+    const tasks = `select * from task where status = 1 and emp_id = ${user_id}`;
+  
+    try {
+      const result =await sequelize.query(tasks, {
+        type: Sequelize.QueryTypes.SELECT,
+      });
+  
+      res.json(result);
+    } catch (error) {
+      res.json({ message: error.message });
+    }
+  };
+  
+  export const GenerateBids = async(req,res)=>{
+    const {user_id,prop_id,bid_price,tender_type,expire_date} = req.body;
+    const bidparams = {
+      user_id,
+      prop_id,
+      bid_price,
+      tender_type,
+      date: new Date(),
+      expire_date,
+    };
+
+    try {
+        const newTask = await GenBid.create(bidparams)
+        if(newTask){
+          res.json({"message": "Bid Generated"});
+        }
+    } catch (error) {
+      res.json({
+        "error": error.message
+      })
+    }
+  }

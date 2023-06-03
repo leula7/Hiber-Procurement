@@ -44,6 +44,7 @@ function App() {
                 <Route path="/requestsform" element={<RequestForm />} />
                 <Route path="/table" element={<Table />} />
                 <Route path="/tendercard" element={<TenderCard />} />
+                <Route path="/requestfinal" element={<TenderCard />} />
 
               </Route>
             

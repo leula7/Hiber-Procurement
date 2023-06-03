@@ -10,7 +10,8 @@ import BranchManager from './routers/BranchManager.js';
 import Auth from './routers/Auth.js';
 import Supplier from './routers/Supplier.js';
 import Chat from './routers/chat.js';
-import Approval from './routers/Approval.js'
+import Approval from './routers/Approval.js';
+import Director from './routers/Director.js'
 
 import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
@@ -69,6 +70,9 @@ app.use('/', Chat);
 
 //Aproval 
 app.use('/',Approval);
+
+//Director 
+app.use('/',Director);
 
 //Auth
 app.use('/', Auth);

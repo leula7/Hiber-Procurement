@@ -9,7 +9,7 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "./FlexBetween";
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout} from "state/state";
+import { setMode, setLogout } from "state/state";
 import ProfileImage from "../assets/profile.jpeg";
 import {
   useTheme,
@@ -25,26 +25,23 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-
 const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
-  // const user = useSelector((state)=> state.auth.user)
-  const user ={
-    username:"jack",
-    position:"spartacus"
-  }
+  const user = useSelector((state) => state.auth.user);
+
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
-  // const name = `${user.firstName} ${user.lastName}`
-  const logoutHandler= ()=>{
+
+  const logoutHandler = () => {
     dispatch(setLogout());
     navigate("/");
-  }
+  };
 
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  
   return (
     <AppBar
       sx={{
@@ -71,7 +68,8 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             </IconButton>
           </FlexBetween>
         </FlexBetween>
-        {/* RIGHT SIDE */}
+        
+        {/* Right side */}
         <FlexBetween gap="1.5rem">
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
@@ -83,6 +81,8 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton>
             <SettingsOutlined sx={{ fontSize: "25px" }} />
           </IconButton>
+          
+          {/* User profile and logout dropdown */}
           <FlexBetween>
             <Button
               onClick={handleClick}
@@ -122,14 +122,16 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <ArrowDropDownOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "25px" }}
             />
-            <Menu 
-                anchorEl={anchorEl}
-                open={isOpen}
-                onClose={handleClose}
-                anchorOrigin={{vertical:'bottom', horizontal: 'center'}}
-                >
-                  <MenuItem onClick={logoutHandler}>Log Out</MenuItem>
-                  </Menu>
+            
+            {/* Logout dropdown menu */}
+            <Menu
+              anchorEl={anchorEl}
+              open={isOpen}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <MenuItem onClick={logoutHandler}>Log Out</MenuItem>
+            </Menu>
           </FlexBetween>
         </FlexBetween>
       </Toolbar>

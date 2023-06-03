@@ -52,31 +52,43 @@ export const ApproveProposal = async (req, res) => {
     }
 }
 
-
-/*
-    SELECT subquery.cat_id, subquery.cata_Name, subquery.total_price
-FROM (
-  SELECT c.cat_id, c.cata_Name, SUM(ar.quantity * i.price) AS total_price
-  FROM filter_needs fn
-  LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
-  LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
-  LEFT JOIN item i ON i.item_id = ar.item_id
-  LEFT JOIN catagory c ON c.cat_id = i.cat_id
-  WHERE i.cat_id = c.cat_id
-  GROUP BY c.cat_id, c.cata_Name
-
-  UNION
-
-  SELECT c.cat_id, c.cata_Name, SUM(rp.quantity * i.price) AS total_price
-  FROM filter_needs fn
-  LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
-  LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
-  LEFT JOIN item i ON i.item_id = rp.item_id
-  LEFT JOIN catagory c ON c.cat_id = i.cat_id
-  WHERE i.cat_id = c.cat_id
-  GROUP BY c.cat_id, c.cata_Name
-) AS subquery
-GROUP BY subquery.cat_id, subquery.cata_Name
-LIMIT 0, 25;
-
-*/
+export const proposaldetail = async(req,res)=>{
+  
+  const Cat_id = 1;
+  console.log("Id: ",Cat_id)
+  const proposaldetail = `SELECT subquery.cat_id, subquery.cata_Name, subquery.total_price
+                          FROM (
+                            SELECT c.cat_id, c.cata_Name, SUM(ar.quantity * i.price) AS total_price
+                            FROM filter_needs fn
+                            LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+                            LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
+                            LEFT JOIN item i ON i.item_id = ar.item_id
+                            LEFT JOIN catagory c ON c.cat_id = i.cat_id
+                            WHERE i.cat_id = :cat_id
+                            GROUP BY c.cat_id, c.cata_Name
+                          
+                            UNION
+                          
+                            SELECT c.cat_id, c.cata_Name, SUM(rp.quantity * i.price) AS total_price
+                            FROM filter_needs fn
+                            LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+                            LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
+                            LEFT JOIN item i ON i.item_id = rp.item_id
+                            LEFT JOIN catagory c ON c.cat_id = i.cat_id
+                            WHERE i.cat_id = cat_id
+                            GROUP BY c.cat_id, c.cata_Name
+                          ) AS subquery
+                          GROUP BY subquery.cat_id, subquery.cata_Name
+                          ;`
+        try {
+          const result= await sequelize.query(proposaldetail,{
+            replacements: { cat_id: Cat_id },
+            type: sequelize.QueryTypes.SELECT });
+          res.status(200).send(result);
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({
+            message: "Error occurred while fetching proposals"
+          });
+        }
+  }

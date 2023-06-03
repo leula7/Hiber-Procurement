@@ -1,5 +1,6 @@
 import {Router} from 'express';
-import { filter_documnet, filterdata, filtered_data, generateBid, generateProposal, generatedocument, 
+import { GenerateBids, doneTasks, filter_documnet, filterdata, filtered_data, generateBid, generateProposal, generatedocument, 
+  getTasks, 
   quarterPrice, setprice, techDoc, technical_documnets, 
   updateCatagory, updateItem } from '../controller/MarketOfficer.controller.js';
 
@@ -30,5 +31,11 @@ const router = Router();
   router.get("/filter-document",filter_documnet);
 
   router.post("/generateproposal",generateProposal);
+
+  router.post("/generateproposal",getTasks);
+
+  router.post("/generateproposal",doneTasks);
+
+  router.post("/generatebid",GenerateBids);
   
   export default router;
