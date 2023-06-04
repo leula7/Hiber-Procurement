@@ -4,6 +4,7 @@ import Item from '../model/MarketOfficer/SetItem.model.js';
 import { Bid } from '../model/MarketOfficer/bid.model.js';
 import Category from '../model/MarketOfficer/updateCatagory.model.js';
 import GenBid from '../model/MarketOfficer/GenerateBid.model.js';
+import fs from 'fs';
 
 export const generatedocument = async(req,res)=>{
   const getDocument = `
@@ -337,36 +338,33 @@ export const generatedocument = async(req,res)=>{
 
   export const generateProposal = async (req, res) => {
     const user_id = req.body.user_id;
-    
-    const propos = `INSERT INTO proposal (user_id, cat_id, total_price)
-    SELECT ${user_id},subquery.cat_id,subquery.total_price
-FROM (
-  SELECT c.cat_id, c.cata_Name, SUM(ar.quantity * i.price) AS total_price
-  FROM filter_needs fn
-  LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
-  LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
-  LEFT JOIN item i ON i.item_id = ar.item_id
-  LEFT JOIN catagory c ON c.cat_id = i.cat_id
-  WHERE i.cat_id = c.cat_id
-  GROUP BY c.cat_id, c.cata_Name
-
-  UNION
-
-  SELECT c.cat_id, c.cata_Name, SUM(rp.quantity * i.price) AS total_price
-  FROM filter_needs fn
-  LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
-  LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
-  LEFT JOIN item i ON i.item_id = rp.item_id
-  LEFT JOIN catagory c ON c.cat_id = i.cat_id
-  WHERE i.cat_id = c.cat_id
-  GROUP BY c.cat_id, c.cata_Name
-) AS subquery
-GROUP BY subquery.cat_id, subquery.cata_Name
-LIMIT 0, 25;`;
+    const propos = `INSERT INTO proposal (user_id,total_price)
+                    SELECT :user_id,SUM(subquery.total_price) AS total_price
+                    FROM (
+                        SELECT fn.Date, SUM(ar.quantity * i.price) AS total_price
+                        FROM filter_needs fn
+                        LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+                        LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
+                        LEFT JOIN item i ON i.item_id = ar.item_id
+                        WHERE YEAR(fn.Date) = YEAR(CURDATE())
+                        GROUP BY fn.Date
+                    
+                        UNION ALL
+                    
+                        SELECT fn.Date, SUM(rp.quantity * i.price) AS total_price
+                        FROM filter_needs fn
+                        LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+                        LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
+                        LEFT JOIN item i ON i.item_id = rp.item_id
+                        WHERE YEAR(fn.Date) = YEAR(CURDATE())
+                        GROUP BY fn.Date
+                    ) AS subquery
+                    GROUP BY subquery.date;`;
   
     try {
       await sequelize.query(propos, {
         type: Sequelize.QueryTypes.INSERT,
+        replacements: { user_id },
       });
   
       res.json({ message: 'Insertion successful' });
@@ -407,25 +405,66 @@ LIMIT 0, 25;`;
     }
   };
   
-  export const GenerateBids = async(req,res)=>{
-    const {user_id,prop_id,bid_price,tender_type,expire_date} = req.body;
+  export const GenerateBids = async (req, res) => {
+    const { prop_id, user_id, cat_id, bid_price, tender_type, tech_expire_date, financial_start_date } = req.body;
+    const oldname = req.file.filename;
+    const newname = req.file.originalname;
     const bidparams = {
       user_id,
       prop_id,
+      cat_id,
       bid_price,
+      bid_file: req.file.originalname,
       tender_type,
       date: new Date(),
-      expire_date,
+      tech_expire_date,
+      financial_start_date,
     };
-
+    const currentDate = new Date();
+    const year = currentDate.getFullYear().toString().slice(-2);
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  
+    const uploadPath = `./uploads/bids/${month}-${year}/${newname}`;
+    const uploadFolder = `./uploads/bids/${month}-${year}`;
     try {
-        const newTask = await GenBid.create(bidparams)
-        if(newTask){
-          res.json({"message": "Bid Generated"});
+      const newTask = await GenBid.create(bidparams);
+      if (newTask) {
+        try {
+          if (!fs.existsSync(uploadFolder)) {
+            try {
+              fs.mkdirSync(uploadFolder);
+            } catch (error) {
+              console.error("Error while creating the directory:", error);
+              res.status(500).json({ error: "Error while creating the directory", details: error.message });
+              return;
+            }
+          }
+          
+          await fs.promises.rename(`./uploads/${oldname}`, uploadPath);
+          res.json({ message: "Bid Generated" });
+        } catch (error) {
+          console.error("Error while renaming the file:", error);
+          res.status(500).json({ error: "Error while renaming the file", details: error.message });
         }
+      }
     } catch (error) {
-      res.json({
-        "error": error.message
-      })
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+  export const ApprovedProposals = async(req,res)=>{
+
+    const approvedproposal = `select * from proposal where status = 1`;
+  
+    try {
+      const result =await sequelize.query(approvedproposal, {
+        type: Sequelize.QueryTypes.SELECT,
+      });
+  
+      res.json(result);
+    } catch (error) {
+      res.json({ message: error.message });
     }
   }
+
+  

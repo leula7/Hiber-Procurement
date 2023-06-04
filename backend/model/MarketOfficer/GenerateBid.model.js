@@ -15,7 +15,15 @@ import sequelize from '../../connection/database.js';
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        cat_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         bid_price: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+        },
+        bid_file: {
             type: DataTypes.FLOAT,
             allowNull: false,
         },
@@ -27,9 +35,13 @@ import sequelize from '../../connection/database.js';
             type: DataTypes.DATE,
             allowNull: false,
         },
-        expire_date: {
+        tech_expire_date: {
             type: DataTypes.DATE,
             allowNull: false,
+        },
+        financial_start_date: {
+            type: DataTypes.DATE,
+            allowNull: true,
         },
         },
         {

@@ -11,8 +11,8 @@ import sequelize from '../../connection/database.js';
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        cat_id: {
-            type: DataTypes.INTEGER,
+        title: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
         total_price: {

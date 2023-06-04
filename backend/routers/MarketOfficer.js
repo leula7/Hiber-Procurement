@@ -1,11 +1,12 @@
 import {Router} from 'express';
-import { GenerateBids, doneTasks, filter_documnet, filterdata, filtered_data, generateBid, generateProposal, generatedocument, 
+import { ApprovedProposals, GenerateBids,  doneTasks, filter_documnet, filterdata, filtered_data, generateBid, generateProposal, generatedocument, 
   getTasks, 
   quarterPrice, setprice, techDoc, technical_documnets, 
   updateCatagory, updateItem } from '../controller/MarketOfficer.controller.js';
+  import multer from "multer";
 
-
-const router = Router();
+  const upload = multer({dest: "./uploads/"});  
+  const router = Router();
 
   router.get("/generated-document",generatedocument);
 
@@ -21,7 +22,6 @@ const router = Router();
 
   router.get("/technical-documents",techDoc);
   
-  //Action Plan
   router.get("/quarter-price",quarterPrice);
 
   router.post("/filterdata", filterdata);
@@ -36,6 +36,7 @@ const router = Router();
 
   router.post("/generateproposal",doneTasks);
 
-  router.post("/generatebid",GenerateBids);
+  router.post("/generatebid",upload.single("bid_file"),GenerateBids);
   
+  router.get("/approved-proposals",ApprovedProposals);
   export default router;
