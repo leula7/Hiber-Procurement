@@ -24,7 +24,7 @@ import sequelize from '../../connection/database.js';
             allowNull: false,
         },
         bid_file: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.STRING,
             allowNull: false,
         },
         tender_type: {

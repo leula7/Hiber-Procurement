@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { ApprovedProposals, GenerateBids,  doneTasks, filter_documnet, filterdata, filtered_data, generateBid, generateProposal, generatedocument, 
+import { ApprovedProposals, EvaluateTechnicalDocument, GenerateBids,  doneTasks, filter_documnet, filterdata, filtered_data, generateProposal, generatedocument, 
   getTasks, 
   quarterPrice, setprice, techDoc, technical_documnets, 
   updateCatagory, updateItem } from '../controller/MarketOfficer.controller.js';
@@ -11,8 +11,6 @@ import { ApprovedProposals, GenerateBids,  doneTasks, filter_documnet, filterdat
   router.get("/generated-document",generatedocument);
 
   router.get("/technical-documents",technical_documnets);
-
-  router.post("/bid",generateBid);
   
   router.put("/setprice/:item_id/:price",setprice);
   
@@ -39,4 +37,6 @@ import { ApprovedProposals, GenerateBids,  doneTasks, filter_documnet, filterdat
   router.post("/generatebid",upload.single("bid_file"),GenerateBids);
   
   router.get("/approved-proposals",ApprovedProposals);
+
+  router.post("/evaluatetechnical",EvaluateTechnicalDocument);
   export default router;

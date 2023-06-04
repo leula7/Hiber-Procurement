@@ -1,10 +1,10 @@
 import { Sequelize } from 'sequelize';
 import sequelize from '../connection/database.js';
 import Item from '../model/MarketOfficer/SetItem.model.js';
-import { Bid } from '../model/MarketOfficer/bid.model.js';
 import Category from '../model/MarketOfficer/updateCatagory.model.js';
 import GenBid from '../model/MarketOfficer/GenerateBid.model.js';
 import fs from 'fs';
+import EvaluateTechnical from '../model/MarketOfficer/evaluate_technical.model.js';
 
 export const generatedocument = async(req,res)=>{
   const getDocument = `
@@ -87,23 +87,20 @@ export const generatedocument = async(req,res)=>{
     
   };
 
-  export const generateBid = async(req,res)=>{
+  export const EvaluateTechnicalDocument = async(req,res)=>{
     try {
-      const { user_id, catagory, quantity, price, unit, procureType } = req.body;
-      console.log(req.body);
-      const response = await Bid.create({
+      const { user_id, technical_id, evaluate_value} = req.body;
+
+      const response = await EvaluateTechnical.create({
         user_id: user_id,
-        cat_id: catagory,
-        quantity: quantity,
-        price: price,
-        unit: unit,
-        tender_type: procureType
+        technical_id: technical_id,
+        evaluate_value: evaluate_value,
       });
       
       if (response) {
-        res.json({ "message": "Bid Generated", "row": response.affectedRows });
+        res.json({ "message": "Evaluation Success"});
       } else {
-        res.json({ "row": response.affectedRows });
+        res.json({ "message": "Evaluation Error"} );
       }
     } catch (error) {
       console.log(error);
@@ -409,12 +406,14 @@ export const generatedocument = async(req,res)=>{
     const { prop_id, user_id, cat_id, bid_price, tender_type, tech_expire_date, financial_start_date } = req.body;
     const oldname = req.file.filename;
     const newname = req.file.originalname;
+    const timestamp = Date.now();
+    const uniqueFilename = `${newname}_${timestamp}`;
     const bidparams = {
       user_id,
       prop_id,
       cat_id,
       bid_price,
-      bid_file: req.file.originalname,
+      bid_file: uniqueFilename,
       tender_type,
       date: new Date(),
       tech_expire_date,
