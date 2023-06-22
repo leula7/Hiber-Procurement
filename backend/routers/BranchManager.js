@@ -3,10 +3,10 @@ import { pendingRequest,ApproveRequstes,RejectRequests } from '../controller/Bra
 
   const router = Router();
 
-  router.get('/pending-requests/:branch_id',pendingRequest);
+  router.get('/manrequests/:branch_id',pendingRequest);
   
-  router.put('/requests/:user_id/:requestId/approve',ApproveRequstes);
+  router.put('/requests/approve',ApproveRequstes);
   
-  router.put('/requests/:user_id/:requestId/reject',RejectRequests);
+  router.put('/requests/reject',RejectRequests);
 
 export default router;

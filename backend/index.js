@@ -1,5 +1,5 @@
 import cors from "cors";
-import express, { response } from 'express';
+import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 
@@ -12,14 +12,13 @@ import Supplier from './routers/Supplier.js';
 import Chat from './routers/chat.js';
 import Approval from './routers/Approval.js';
 import Director from './routers/Director.js'
-
 import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
-import verifyToken from "./verifyToken.js";
 
 dotenv.config({path: 'connections.env'});
 
 const app = express();
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -45,25 +44,6 @@ return res.json({
 next(err);
 });
 
-//Flood Controle
-// const limiter = rateLimit({
-//   windowMs: 60 * 1000, // 1 minute
-//   max: 100,
-//   message: "Too many requests, please try again later."
-// });
-
-// app.use(limiter);
-
-// Apply slowing down of responses to mitigate heavy traffic
-// const speedLimiter = slowDown({
-//   windowMs: 60 * 1000, // 1 minute
-//   delayAfter: 1000, // Delay response after 100 requests
-//   delayMs: 50, // Delay response by 500ms
-// });
-
-// app.use(speedLimiter);
-//General 
-
 app.use('/', General);
 
 //Chat
@@ -77,7 +57,6 @@ app.use('/',Director);
 
 //Auth
 app.use('/', Auth);
-// app.use(verifyToken);
 
 //Branch Assistant 
 app.use('/', Assistant);

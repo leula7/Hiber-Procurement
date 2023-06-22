@@ -5,7 +5,7 @@ const router = Router();
 
   router.post('/request',requests);
 
-  router.get('/approved-requests/:user_id',approveRequest);
+  router.get('/requests/:user_id',approveRequest);
   
   router.get('/waiting-requests/:user_id', waitingReequest);
 

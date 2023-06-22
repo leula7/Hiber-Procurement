@@ -19,6 +19,9 @@ import Proposal from '../model/Approval/Approve.model.js';
 
   export const ApproveProposal = async (req, res) => {
     try {
+          if(req.params.prop_id == null || req.params.checked_by == null ||  req.params.status == null){
+            return;
+          }
         const prop_id = req.params.prop_id;
         const checked_by = req.params.user_id;
         const status = req.params.status;// 0 or 1
@@ -35,7 +38,7 @@ import Proposal from '../model/Approval/Approve.model.js';
           console.log(req.params);
         if (result[0] > 0) {
           
-          res.json({
+          res.status(200).json({
             error: '200',
             message: 'Approve Successfully',
           });
@@ -52,6 +55,9 @@ import Proposal from '../model/Approval/Approve.model.js';
   }
 
   export const proposalcatagories = async(req,res)=>{
+    if(req.params.date == null){
+      return;
+    }
     const date = req.params.date;
     const proposals = `SELECT cata_Name,cat_id,SUM(tot) as total
                         FROM (
@@ -90,7 +96,11 @@ import Proposal from '../model/Approval/Approve.model.js';
 
 
   export const proposaldetail = async(req,res)=>{
-  
+    
+      if(req.params.date == null || req.params.cat_id == null){
+        return;
+      }
+    
     const Cat_id = req.params.cat_id;
     const date = req.params.date;
     const proposaldetail = `SELECT b.Branch_id,i.item_name,b.Branch_Name,ar.quantity,i.price,(i.price*ar.quantity) as total

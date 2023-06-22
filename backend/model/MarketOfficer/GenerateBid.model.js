@@ -21,26 +21,46 @@ import sequelize from '../../connection/database.js';
         },
         bid_price: {
             type: DataTypes.FLOAT,
-            allowNull: false,
+            allowNull: true,
         },
         bid_file: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
+        },
+        bid_title: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         tender_type: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         date: {
             type: DataTypes.DATE,
             allowNull: false,
         },
-        tech_expire_date: {
+        deadline_date: {
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: true,
         },
-        financial_start_date: {
+        financial_open_date: {
             type: DataTypes.DATE,
+            allowNull: true,
+        },
+        publish: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        tech_visibility: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        financial_visiblity: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        bid_done: {
+            type: DataTypes.INTEGER,
             allowNull: true,
         },
         },

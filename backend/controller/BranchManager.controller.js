@@ -5,6 +5,15 @@ import sequelize from "../connection/database.js";
         try {
           try {
             const branch_id = req.params.branch_id;
+            console.log("kjfadslkfjldsjf: ",branch_id);
+            if (!branch_id) {
+              return res.json({
+                user: {},
+                error: '400',
+                message: 'UnAuthorized user',
+              });
+            }
+
             const pendingRequestsQuery = `
               SELECT ra.req_id AS request_id, 
                 b.branch_name, b.branch_id, u.user_id, i.item_name, i.item_id, 
@@ -15,7 +24,6 @@ import sequelize from "../connection/database.js";
               JOIN item i ON a.item_id = i.item_id 
               JOIN user u ON a.user_id = u.user_id 
               JOIN branch b ON u.branch_id = b.branch_id 
-              WHERE ra.req_status = 'Pending' 
               AND b.branch_id = ?
               UNION
               SELECT ra.req_id AS request_id, 
@@ -27,7 +35,6 @@ import sequelize from "../connection/database.js";
               JOIN item i ON a.item_id = i.item_id 
               JOIN user u ON a.user_id = u.user_id 
               JOIN branch b ON u.branch_id = b.branch_id 
-              WHERE ra.req_status = 'Pending' 
               AND b.branch_id = ?; `;
           
             const result = await sequelize.query(pendingRequestsQuery, {
@@ -36,7 +43,7 @@ import sequelize from "../connection/database.js";
             });
           
             res.status(200).send({
-              pendingRequests: result,
+              result,
             });
           }catch (error) {
             console.error(error);
@@ -54,10 +61,18 @@ import sequelize from "../connection/database.js";
 
     export const ApproveRequstes = async (req, res) => {
         try {
-            const requestId = req.params.requestId;
-            const man_id = req.params.user_id;
+            const requestId = req.body.requestId;
+            const man_id = req.body.user_id;
             const router = 'Approve';
-      
+
+            if (!requestId || !man_id || !router) {
+              return res.json({
+                user: {},
+                error: '400',
+                message: 'Invalide Input',
+              });
+            }
+
             const result = await RequestApprove.update({
                 user_id: man_id,
                 req_status: router,
@@ -67,9 +82,7 @@ import sequelize from "../connection/database.js";
                   req_app_id: requestId,
                 },
               });
-
             if (result[0] > 0) {
-              console.log(result);
               res.json({
                 error: '200',
                 message: 'Approve Successfully',
@@ -88,11 +101,16 @@ import sequelize from "../connection/database.js";
 
     export const RejectRequests = async (req, res) => {
       try {
-        const requestId = req.params.requestId;
-        const man_id = req.params.user_id;
-      
+        const requestId = req.body.requestId;
+        const man_id = req.body.user_id;
         const router = "Reject";
-        
+        if (!requestId || !man_id || !router) {
+          return res.json({
+            user: {},
+            error: '400',
+            message: 'Invalide Input',
+          });
+        }
         const result = await RequestApprove.update(
           { user_id: man_id, req_status: router },
           { where: { req_app_id: requestId } }

@@ -52,9 +52,13 @@ const Supplier = sequelize.define('Register', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  tin_number: {
+  email: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  tin_number: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   username: {
     type: DataTypes.STRING,

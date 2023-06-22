@@ -15,6 +15,10 @@ import sequelize from '../../connection/database.js';
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        prop_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         cat_id: {
             type: DataTypes.INTEGER,
             allowNull: false,

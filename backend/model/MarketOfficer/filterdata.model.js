@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../../connection/database.js';
 
 const FilterNeeds = sequelize.define('filter_needs', {
-    id: {
+    filter_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -11,18 +11,23 @@ const FilterNeeds = sequelize.define('filter_needs', {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    request_id: {
+    filter_req_app: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    created_at: {
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: DataTypes.NOW,
+    },
+    Date: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-    updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  });
+  },
+  {
+    timestamps: false,
+  }
+  
+  );
 
   export default FilterNeeds;

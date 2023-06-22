@@ -10,7 +10,8 @@ const DB_Name = process.env.DB_Name;
 // Initialize Sequelize with database credentials
 const sequelize = new Sequelize(DB_Name,DB_USER,DB_PASSWORD, {
   host: hosts, // Replace with your database host
-  dialect: 'mysql', // Replace with your database dialect (e.g., mysql, postgres, sqlite)
+  dialect: 'mysql',
+ // Replace with your database dialect (e.g., mysql, postgres, sqlite)
 });
 
 // Test the database connection

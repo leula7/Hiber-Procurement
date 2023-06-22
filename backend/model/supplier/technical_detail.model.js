@@ -7,11 +7,7 @@ import sequelize from '../../connection/database.js';
             primaryKey: true,
             autoIncrement: true,
         },
-        sup_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        bid_id: {
+        bid_participate_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },

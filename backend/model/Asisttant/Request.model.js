@@ -19,10 +19,6 @@ id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   tag_no: {
     type: DataTypes.STRING,
     allowNull: false,

@@ -41,7 +41,7 @@ import sequelize from '../connection/database.js';
 
   export const items = async(req,res)=>{
     try {
-      const itemQuery = "select *from item";
+      const itemQuery = "select item_id,item_name,c.cat_id,cata_Name,price from item i left join catagory c on c.cat_id = i.cat_id";
       const items = await sequelize.query(itemQuery,{type: sequelize.QueryTypes.SELECT});
       res.json(items);
     } catch (error) {
@@ -60,7 +60,7 @@ import sequelize from '../connection/database.js';
         const item = await sequelize.query(itemQuerys, {
           type: sequelize.QueryTypes.SELECT,
         });
-         res.json(item);
+        res.status(200).jsonjson(item);
       }else{
 
       filesParams.push(cat_id);
