@@ -9,6 +9,7 @@
     "express-slow-down": "^1.6.0",
     "express-validator": "^7.0.1",
     "fs": "^0.0.1-security",
+    "https": "^1.0.0",
     "jsonwebtoken": "^9.0.0",
     "md5": "^2.3.0",
     "mime": "^3.0.0",
@@ -19,6 +20,7 @@
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.3",
     "nodemon": "^2.0.19",
+    "openssl": "^2.0.0",
     "sequelize": "^6.31.1"
   },
   "name": "backend",

@@ -28,8 +28,20 @@ const User = sequelize.define('Register', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   password: {
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  approved_by: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 },
@@ -66,6 +78,14 @@ const Supplier = sequelize.define('Register', {
   },
   password: {
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  approved_by: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 },

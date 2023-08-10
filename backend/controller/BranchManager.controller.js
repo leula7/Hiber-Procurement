@@ -16,7 +16,7 @@ import sequelize from "../connection/database.js";
 
             const pendingRequestsQuery = `
               SELECT ra.req_id AS request_id, 
-                b.branch_name, b.branch_id, u.user_id, i.item_name, i.item_id, 
+                b.branch_name, b.branch_id, u.user_id,a.other_reason, i.item_name, i.item_id, 
                 i.price, a.quantity, 'Additional' AS purpose, a.time_of_purchase,
                 ra.req_app_id, ra.user_id AS approved_by_user_id, ra.req_status
               FROM request_approve ra 
@@ -27,7 +27,7 @@ import sequelize from "../connection/database.js";
               AND b.branch_id = ?
               UNION
               SELECT ra.req_id AS request_id, 
-                b.branch_name, b.branch_id, u.user_id, i.item_name, i.item_id, 
+                b.branch_name, b.branch_id, u.user_id,'none' AS other_reason, i.item_name, i.item_id, 
                 i.price, a.quantity, 'Replacement' AS purpose, a.time_of_purchase,
                 ra.req_app_id, ra.user_id AS approved_by_user_id, ra.req_status
               FROM request_approve ra 

@@ -1,14 +1,15 @@
 import {Router} from 'express';
 import { ApprovedProposals, BidInitialize, EvaluateTechnicalDocument, 
         GetBid, 
-        GetParticipants, 
+        GetParticipants,  
+        GetTechnicalPdf, 
         ItemDetail, 
         MyTasks, 
         doneTasks, filter_documnet, 
         filterdata, filtered_data, generateProposal, 
         generatedocument, getProposal, getPublished, getWinners, ongoingDetail, quarterPrice, 
         setWinner, 
-        setprice, singleTask, taskDetail, techDoc, technicalDetail, updateBid, updateCatagory, updateItem, uploadBidDocument 
+        setprice, singleTask, taskDetail, technicalDetail, updateBid, updateCatagory, updateItem, uploadBidDocument 
   } from '../controller/MarketOfficer.controller.js';
   
   import multer from "multer";
@@ -38,6 +39,8 @@ import { ApprovedProposals, BidInitialize, EvaluateTechnicalDocument,
   router.post("/generateproposal",generateProposal);
 
   router.get("/proposals",getProposal);
+
+  router.get("/proposalsid",getProposal);
 
   router.get("/approved-proposals",ApprovedProposals);
 
@@ -71,10 +74,10 @@ import { ApprovedProposals, BidInitialize, EvaluateTechnicalDocument,
   router.put("/update-catagory/:cat_id/:cata_Name",updateCatagory);
   
   router.put("/update-item/:item_id/:item_name",updateItem);
-
-  router.get("/technical-documents",techDoc);
   
   router.get("/quarter-price",quarterPrice);
+
+  router.get("/read-technical/:username/:file_names",GetTechnicalPdf);
 
   
   export default router;

@@ -6,18 +6,25 @@ const DialogView = ({open,onClose, row, onAccept, onReject}) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Row Details</DialogTitle>
       <DialogContent>
-        {/* Display the row details in the dialog */}
-        <p>ID: {row?.id}</p>
-        <p>Name: {row?.name}</p>
-        {/* Add more row details as needed */}
+        <p>ID: {row?.item_name}</p>
+        <p>reason: {row?.purpose}</p>
+        {row?.other_reason && (
+            <p>{row?.other_reason}</p>
+        )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onAccept} variant="contained" color="primary">
+        { onAccept && (
+          <>
+            <Button onClick={onAccept} variant="contained" color="primary">
           Accept
         </Button>
         <Button onClick={onReject} variant="contained" color="secondary">
           Reject
         </Button>
+          </>
+        )
+        }
+       
       </DialogActions>
     </Dialog>
   )

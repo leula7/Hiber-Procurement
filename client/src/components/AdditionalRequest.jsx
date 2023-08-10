@@ -1,45 +1,34 @@
-import { Box, Button, TextField,Select, MenuItem,FormControl ,InputLabel } from "@mui/material";
+import { Box, Button, MenuItem, TextField, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Items } from "api/Global";
-import { useEffect,useState } from "react";
-
+import { useGetItemsQuery } from "state/api";
 
 const AdditionalRequest = ({handler}) => {
+  const theme = useTheme();
     const isNonMobile = useMediaQuery("(min-width:600px)");
-    const [item, setItem] = useState([]);
+    const {data:items,isLoding} = useGetItemsQuery();
+    console.log(items)
     const initialValues = {
         quantity: "",
         time_of_purchase: "",
         title_of_post: "",
         other_reason: "",
-        item_id: ""
+        item_id:""
       };
       const checkoutSchema = yup.object().shape({
         quantity: yup.string().required("required"),
         time_of_purchase: yup.string().required("required"),
         title_of_post: yup.string().required("required"),
         other_reason: yup.string().required("required"),
+        item_id:yup.number().required("required"),
       });
-
-  useEffect(() => {
-    const fethcAllItem = async () => {
-      try {
-        const res = await Items();
-        setItem(res.data);
-      } catch (err) {
-        alert(err);
-      }
-    };
-     fethcAllItem();
-  },[]);
-
   return (
     <Formik
     onSubmit={handler}
     initialValues={initialValues}
-    validationSchema={checkoutSchema} >
+    validationSchema={checkoutSchema}
+  >
     {({
       values,
       errors,
@@ -85,6 +74,27 @@ const AdditionalRequest = ({handler}) => {
             sx={{ gridColumn: "span 5" }}
           />
           <TextField
+              fullWidth
+              variant="filled"
+              select
+              label="Item ID"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.item_id}
+              name="item_id"
+              error={!!touched.item_id && !!errors.item_id}
+              helperText={touched.item_id && errors.item_id}
+              sx={{ gridColumn: "span 5" }}
+            >
+              {items?.map((item) => (
+                <MenuItem sx={{
+                  color: theme.palette.secondary.light
+                }} key={item.item_id} value={item.item_id}>
+                  {item.item_name}
+                </MenuItem>
+              ))}
+            </TextField>
+          <TextField
             fullWidth
             variant="filled"
             type="text"
@@ -112,35 +122,6 @@ const AdditionalRequest = ({handler}) => {
           />
          
         </Box>
-        <Box display="flex" alignItems="center">
-        <span>Description (item)</span>
-        <FormControl fullWidth variant="filled" sx={{ marginLeft: '1rem' }}>
-          <InputLabel htmlFor="item-select">Item</InputLabel>
-          <Select
-            id="item-select"
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={values.item_id}
-            name="item_id"
-            error={!!touched.item_id && !!errors.item_id}
-            helperText={touched.item_id && errors.item_id}
-            sx={{
-              minWidth: '200px',
-              marginLeft: '1rem',
-              marginTop: '0.5rem',
-            }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {item?.map((item) => (
-              <MenuItem key={item.item_id} value={item.item_id}>
-                {item.item_name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
         <Box display="flex" justifyContent="end" mt="20px" gap="1rem">
         <Button  color="secondary" variant="contained"  >
             Reset Fields

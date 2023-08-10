@@ -4,7 +4,6 @@ import path from "path";
 import { expressjwt } from "express-jwt";
 import md5 from "md5";
 import dotenv from 'dotenv';
-import Branch from '../model/General/Branch.model.js';
 import sequelize from '../connection/database.js';
 import fs from 'fs'
 
@@ -16,7 +15,8 @@ export const AuthRegister = async (req, res) => {
   try {
     // Get input from user
     console.log(req.body);
-    const { First_Name, Last_Name, position, branch_id, username, password, tin_number, spec, email } = req.body;
+    const { First_Name, Last_Name, position, branch_id, username, 
+      password, tin_number, spec, email } = req.body;
     if (req.body == null) {
       return;
     }
@@ -46,25 +46,11 @@ export const AuthRegister = async (req, res) => {
         password: hashedPassword,
       };
       model = Supplier;
-    } else if (position === 'concerned_dep') {
-      // Handle concerned_dep registration logic if needed
-    } else {
-      registerParams = {
-        First_Name,
-        Last_Name,
-        position,
-        branch_id: branch_id,
-        username,
-        password: hashedPassword,
-      };
-      model = User;
-    }
-
+    } 
     const newUser = await model.create(registerParams);
 
     if (newUser) {
       const userDir = path.join('uploads', username);
-
       if (position === 'supplier') {
         createFolder(userDir, res);
       } else {
@@ -119,7 +105,7 @@ export const AuthLogin = async (req, res) => {
       }
   
       const user = await sequelize.query(
-        `SELECT user_id,position,username,b.branch_id,Branch_Name FROM user u LEFT JOIN branch b 
+        `SELECT user_id,position,username,First_Name,b.branch_id,Branch_Name FROM user u LEFT JOIN branch b 
         ON b.Branch_id = u.branch_id WHERE username = :username and password = :password`,
         {
           replacements: { username: username, password: password },
@@ -149,7 +135,8 @@ export const AuthLogin = async (req, res) => {
         return;
       } 
         const supplier = await sequelize.query(
-          `SELECT supplier_id,First_Name,Last_Name,username from supplier WHERE username = :username and password = :password`,
+          `SELECT supplier_id,First_Name,Last_Name,email,username from supplier WHERE 
+          username = :username and password = :password`,
           {
             replacements: { username: username, password: password },
             type: sequelize.QueryTypes.SELECT,

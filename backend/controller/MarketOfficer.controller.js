@@ -5,11 +5,15 @@ import Category from '../model/MarketOfficer/updateCatagory.model.js';
 import GenBid from '../model/MarketOfficer/GenerateBid.model.js';
 import fs from 'fs';
 import EvaluateTechnical from '../model/MarketOfficer/evaluate_technical.model.js';
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
 import cron from 'node-cron';
 import { Op } from 'sequelize';
 import FilterNeeds from '../model/MarketOfficer/filterdata.model.js';
 import { validationResult } from 'express-validator';
+import path from "path";
+import { fileURLToPath } from 'url';
+import { Console } from 'console';
+
 
   export const MyTasks = async (req, res) => {
     const emp_id = req.params.emp_id;
@@ -63,7 +67,7 @@ import { validationResult } from 'express-validator';
 
   export const taskDetail = async (req,res)=>{
     const cat_id = req.params.cat_id;
-    console.log("Jase: ",req.body)
+    console.log("🚀 ~ file: MarketOfficer.controller.js:69 ~ taskDetail ~ cat_id:", cat_id)
     const tasks = `SELECT t.prop_id, t.cat_id, i.item_name, i.item_id, SUM(ar.quantity) as quantity
     FROM task t
     LEFT JOIN proposal p ON p.prop_id = t.prop_id
@@ -151,30 +155,6 @@ import { validationResult } from 'express-validator';
 
   };
 
-  // export const technical_documnets = async(req,res)=>{
-  //   const { supplier_id, position } = req.query;
-
-  //   let filesQuery = "SELECT * FROM files";
-  //   const filesParams = [];
-    
-  //   if (position === "supplier") {
-  //     filesQuery = "SELECT * FROM files WHERE supplier_id = ?";
-  //     filesParams.push(supplier_id);
-  //   }
-    
-  //   try {
-  //     const response = await sequelize.query(filesQuery, {
-  //       type: sequelize.QueryTypes.SELECT,
-  //       replacements: filesParams,
-  //     });
-    
-  //     res.json({ response });
-  //   } catch (error) {
-  //     res.json({ message: error.message });
-  //   }
-    
-  // };
-
   export const setprice = async (req, res) => {
     try {
       const { item_id, price } = req.body;
@@ -236,26 +216,6 @@ import { validationResult } from 'express-validator';
         res.json({ error: '400', message: error.message });
       }
   };
-
-  export const techDoc = async(req,res)=>{
-    const {supplier_id,position} = req.query;
-
-      let filesQuery = "SELECT * FROM files WHERE supplier_id = ?";
-      if (position === "supplier") {
-        filesQuery = "SELECT * FROM files WHERE supplier_id = ?";
-      } else {
-        filesQuery = "SELECT * FROM files";
-      }
-
-      const response = await sequelize.query(filesQuery, {
-        replacements: [supplier_id],
-        type: sequelize.QueryTypes.SELECT
-      });
-
-      res.json({
-        response
-      });
-};
 
   export const quarterPrice = async(req,res)=>{
       const quarterPrice =  `  SELECT i.cat_id, c.cata_Name, r.time_of_purchase AS quarter, i.cat_id AS item_cat_id,
@@ -559,7 +519,7 @@ import { validationResult } from 'express-validator';
               tech_visibility,
               financial_visibility,
             } = req.body;
-  
+
       const result = await GenBid.update(
         {
           bid_price,
@@ -571,6 +531,7 @@ import { validationResult } from 'express-validator';
           tech_visibility,
           financial_visibility,
           bid_done,
+
         },
         { where: { bid_id } }
       );
@@ -591,7 +552,7 @@ import { validationResult } from 'express-validator';
   
   export const GetParticipants = async(req,res)=>{
     const bid_id = req.params.bid_id;
-    const participants = `SELECT bp.bid_participate_id,s.FIrst_Name,s.Last_Name,td.file_name,
+    const participants = `SELECT bp.bid_participate_id,s.First_Name,bp.tech_setatus,s.Last_Name,td.file_name,
                           s.username,td.technical_id FROM bid_participants bp
                           LEFT JOIN technical_doc td on td.bid_participate_id = bp.bid_participate_id
                           LEFT JOIN supplier s on s.supplier_id = bp.sup_id
@@ -613,11 +574,12 @@ import { validationResult } from 'express-validator';
 
   export const technicalDetail = async(req,res)=>{
     const {bid_id,sup_id} = req.params;
-    const participants = `SELECT td.technical_id,bp.bid_participate_id,s.FIrst_Name,s.Last_Name,td.file_name,
+    const participants = `SELECT td.technical_id,bp.bid_participate_id,s.First_Name,s.Last_Name,td.file_name,
                           s.username,td.technical_id FROM bid_participants bp
                           LEFT JOIN technical_doc td on td.bid_participate_id = bp.bid_participate_id
                           LEFT JOIN supplier s on s.supplier_id = bp.sup_id
                           where bid_id = :bid_id and s.supplier_id = :sup_id`;
+                          
     try {
      
       const result= await sequelize.query(participants,{
@@ -636,27 +598,20 @@ import { validationResult } from 'express-validator';
   export const EvaluateTechnicalDocument = async (req, res) => {
     try {
       const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      // Handle validation errors
-      return res.status(400).json({ errors: errors.array() });
-    }
-      const evaluations = req.body; // Assuming an array of evaluation objects
+      if (!errors.isEmpty()) {
+        // Handle validation errors
+        return res.status(400).json({ errors: errors.array() });
+      }
   
-      const responses = await Promise.all(
-        evaluations.map(async (evaluation) => {
-          const { user_id, technical_id, evaluate_value } = evaluation;
+      const { user_id, technical_id, evaluate_value } = req.body;
   
-          const response = await EvaluateTechnical.create({
-            user_id: user_id,
-            technical_id: technical_id,
-            evaluate_value: evaluate_value,
-          });
+      const response = await EvaluateTechnical.create({
+        user_id: user_id,
+        technical_id: technical_id,
+        evaluate_value: evaluate_value,
+      });
   
-          return response;
-        })
-      );
-  
-      if (responses.every((response) => response)) {
+      if (response) {
         res.json({ message: "Evaluation Success" });
       } else {
         res.json({ message: "Evaluation Error" });
@@ -669,13 +624,14 @@ import { validationResult } from 'express-validator';
       });
     }
   };
-
+  
   //SEND EMAIL FOR TECHNICAL PASS SUPPLIER
   export const SedEmailForTechPass = async(bid_id,financial_open_date)=>{
     const getPassedEmails = `SELECT email,et.evaluate_value FROM bid_participants bp
-    LEFT JOIN technical_doc td on bp.bid_participate_id = td.bid_participate_id
-    LEFT JOIN evaluat_technical et on et.technical_id = td.technical_id
-    LEFT JOIN supplier s on s.supplier_id = bp.sup_id WHERE bid_id = :bid_id`;
+                            LEFT JOIN technical_doc td on bp.bid_participate_id = td.bid_participate_id
+                            LEFT JOIN evaluat_technical et on et.technical_id = td.technical_id
+                            LEFT JOIN supplier s on s.supplier_id = bp.sup_id 
+                            WHERE bid_id = :bid_id`;
     const passedTechnical = [];
     const FailTechnical = [];
     const MissedTechnical = [];
@@ -707,7 +663,7 @@ import { validationResult } from 'express-validator';
         const subject = 'Congratulations! Technical Evaluation Passed';
         const message = `Your technical evaluation (score: ${evaluateValue}) passed.\n
                           Financial Will be Open on Date: ${financial_open_date}`;
-       // sendEmail(recipient, subject, message);
+            sendEmail(recipient, subject, message);
       });
 
       FailTechnical.map(fail=>{
@@ -715,14 +671,48 @@ import { validationResult } from 'express-validator';
             const evaluateValue = fail.evaluateValue;
             const subject = 'Technical Evaluation Failed';
             const message = `Unfortunately, your technical evaluation (score: ${evaluateValue}) did not meet the required threshold.`;
-        // sendEmail(recipient, subject, message);
+            sendEmail(recipient, subject, message);
       });
 
       MissedTechnical.map(miss=>{
           const recipient = miss.email;
           const subject = 'Missed Technical Evaluation';
           const message = `You missed the technical evaluation. Please make sure to submit your evaluation in future opportunities.`;
-       //   sendEmail(recipient, subject, message);
+          sendEmail(recipient, subject, message);
+      });
+
+    } catch (error) {
+      console.log(error);
+    } 
+  }
+
+  //SEND EMAIL FOR fINANCIAL WINNER SUPPLIER
+  export const SedEmailForFinancialWinner = async()=>{
+    const getPassedEmails = `SELECT w.win_id,s.email, s.First_Name,s.Last_Name,bi.item_id,fd.bid_participate_id,i.item_name,fd.price FROM winner w
+                                  LEFT JOIN financial_detail fd ON w.finance_detail = fd.finance_id
+                                  LEFT JOIN bid_participants bp ON bp.bid_participate_id = fd.bid_participate_id
+                                  LEFT JOIN bid_items bi ON bi.bid_item_id = fd.bid_item_id
+                                  LEFT JOIN item i ON i.item_id = bi.item_id
+                                  LEFT JOIN supplier s ON s.supplier_id = bp.sup_id`;
+    const Winner = [];
+    
+    try {
+      const financial = await sequelize.query(getPassedEmails);
+    
+      financial[0].map(fincance => {
+        const emailObject = {
+          email: fincance.email,
+          item: fincance.item_name
+        };
+        Winner.push(emailObject);
+      });
+
+      Winner?.map(win=>{
+        const recipient = win.email;
+        const items = win.item;
+        const subject = 'Congratulations! You have Won The finanancial';
+        const message = `Your winning Itmes are ${items}`;
+              sendEmail(recipient, subject, message);
       });
 
     } catch (error) {
@@ -733,13 +723,13 @@ import { validationResult } from 'express-validator';
   export const getWinners = async(req,res)=>{
     const bid_id = req.params.bid_id;
     console.log("Winner: :",bid_id);
-    const winners =  `SELECT w.win_id, s.FIrst_Name,s.Last_Name,bi.item_id,fd.bid_participate_id,i.item_name,fd.price FROM winner w
-    LEFT JOIN financial_detail fd ON w.finance_detail = fd.finance_id
-    LEFT JOIN bid_participants bp ON bp.bid_participate_id = fd.bid_participate_id
-    LEFT JOIN bid_items bi ON bi.bid_item_id = fd.bid_item_id
-    LEFT JOIN item i ON i.item_id = bi.item_id
-    LEFT JOIN supplier s ON s.supplier_id = bp.sup_id
-    WHERE bi.bid_id = :bid_id`
+    const winners =  `SELECT w.win_id, s.First_Name,s.Last_Name,bi.item_id,fd.bid_participate_id,i.item_name,fd.price FROM winner w
+                      LEFT JOIN financial_detail fd ON w.finance_detail = fd.finance_id
+                      LEFT JOIN bid_participants bp ON bp.bid_participate_id = fd.bid_participate_id
+                      LEFT JOIN bid_items bi ON bi.bid_item_id = fd.bid_item_id
+                      LEFT JOIN item i ON i.item_id = bi.item_id
+                      LEFT JOIN supplier s ON s.supplier_id = bp.sup_id
+                      WHERE bi.bid_id = :bid_id`;
       try {
             const result = await sequelize.query(winners, 
             { 
@@ -809,7 +799,7 @@ import { validationResult } from 'express-validator';
                     LEFT JOIN bid_items bi ON bi.bid_item_id = fd.bid_item_id 
                     WHERE fd.price = (SELECT MIN(price) FROM financial_detail WHERE bid_item_id = fd.bid_item_id)`;
       try {
-            const result = await sequelize.query(winners, 
+             await sequelize.query(winners, 
             { type: sequelize.QueryTypes.INSERT });
       } catch (error) {
         console.log("Error Occure")
@@ -837,7 +827,9 @@ import { validationResult } from 'express-validator';
       );
   
       if (finance[0] > 0) {
+        console.log("Financila: :,",finance[0])
         setWinner();
+        SedEmailForFinancialWinner();
         console.log('Financial visibility updated successfully.');
       }
 
@@ -849,7 +841,7 @@ import { validationResult } from 'express-validator';
     }
   };
 
-  const sendEmail = async(to,subject,text)=>{
+  export const sendEmail = async(to,subject,text)=>{
 
     const tranporter = nodemailer.createTransport({
       service: "gmail",
@@ -869,10 +861,34 @@ import { validationResult } from 'express-validator';
     tranporter.sendMail(mailOptions,(error,info)=>{
         if(error){
           console.log(error);
+          return false;
         }else{
           console.log('Email Sent: '+info.response);
+          return true;
         }
     });
   }
+
+  export const GetTechnicalPdf = async (req, res) => {
+    try {
+      // Construct the absolute path to the "run.pdf" file
+      const {username,file_names} = req.params;
+      console.log("🚀 ~ file: MarketOfficer.controller.js:876 ~ GetTechnicalPdf ~ file_names:", file_names)
+      console.log("🚀 ~ file: MarketOfficer.controller.js:876 ~ GetTechnicalPdf ~ username:", username)
+      const __filename = fileURLToPath(import.meta.url);
+      const pdfFilePath = path.resolve(__filename, `../../uploads/${username}/${file_names}.pdf`)
+  
+      // Check if the file exists
+      if (!fs.existsSync(pdfFilePath)) {
+        return res.status(404).send('File not found');
+      }
+     
+      const filecontent = fs.readFileSync(pdfFilePath);
+      res.json(filecontent)
+    } catch (err) {
+      console.error('Error:', err);
+      res.status(500).send('Internal server error.');
+    }
+  };
 
   cron.schedule('*/5 * * * * *', visibility);

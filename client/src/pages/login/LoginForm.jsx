@@ -59,8 +59,8 @@ const initialValuesLogin = {
                 name="username"
                 error={Boolean(touched.username) && Boolean(errors.username)}
                 helperText={touched.username && errors.username}
-                sx={{ gridColumn: "span 4" }}/>
-                
+                sx={{ gridColumn: "span 4" }}
+              />
               <TextField
                 label="Password"
                 type="password"
@@ -81,7 +81,7 @@ const initialValuesLogin = {
                   m: "2rem 0",
                   p: "1rem",
                   backgroundColor: palette.secondary.main,
-                  "&:hover": { color: palette.primary.main },
+                  "&:hover": { color: palette.primary.dark,backgroundColor: palette.secondary.dark},
                 }}
               >
                 Login

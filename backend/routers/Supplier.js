@@ -1,6 +1,8 @@
 import {Router} from 'express';
 import multer from "multer";
-import { BidRegister, FinancialForm, MyDocument, Mytenders, SetFinancial, TenderNews, uploadsTechnical } from '../controller/Supplier.controller.js';
+import { BidRegister, FinancialForm, GetBidPdf, MyDocument, Mytenders, 
+    SetFinancial, TenderNews, uploadsTechnical } from '../controller/Supplier.controller.js';
+import { GetBid } from '../controller/MarketOfficer.controller.js';
 
 
 const router = Router();
@@ -22,5 +24,7 @@ router.post("/mytender/technicalform",upload.single("file"),uploadsTechnical)
 router.post("/mytender/financialform",SetFinancial);
 
 router.post("/mytender/financialform/:sup_id",SetFinancial);
+
+router.get("/bid-download/:bid_file",GetBidPdf);
 
 export default router;

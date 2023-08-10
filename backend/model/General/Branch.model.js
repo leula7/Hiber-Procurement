@@ -13,7 +13,7 @@ const Branch = sequelize.define('branch', {
     },
     District_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     }
   },{tableName: 'branch',timestamps: false,});
 

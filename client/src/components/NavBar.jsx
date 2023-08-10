@@ -9,7 +9,7 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "./FlexBetween";
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout } from "state/state";
+import { setMode, setLogout} from "state/state";
 import ProfileImage from "../assets/profile.jpeg";
 import {
   useTheme,
@@ -22,26 +22,32 @@ import {
   Typography,
   Menu,
   MenuItem,
+  Avatar,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import {  deepPurple } from '@mui/material/colors';
+
 
 const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
-  const user = useSelector((state) => state.auth.user);
-
+  const user = useSelector((state)=> state.auth.user);
+  // console.log(user)
+  // const user ={
+  //   username:"jack ma",
+  //   position:"spartacus"
+  // }
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
-
-  const logoutHandler = () => {
+  // const name = `${user.firstName} ${user.lastName}`
+  const logoutHandler= ()=>{
     dispatch(setLogout());
     navigate("/");
-  };
+  }
 
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
-  
   return (
     <AppBar
       sx={{
@@ -68,8 +74,7 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             </IconButton>
           </FlexBetween>
         </FlexBetween>
-        
-        {/* Right side */}
+        {/* RIGHT SIDE */}
         <FlexBetween gap="1.5rem">
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
@@ -81,8 +86,6 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton>
             <SettingsOutlined sx={{ fontSize: "25px" }} />
           </IconButton>
-          
-          {/* User profile and logout dropdown */}
           <FlexBetween>
             <Button
               onClick={handleClick}
@@ -94,7 +97,7 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 gap: "1rem",
               }}
             >
-              <Box
+              {/* <Box
                 component="img"
                 alt="profile"
                 src={ProfileImage}
@@ -102,15 +105,16 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 width="32px"
                 borderRadius="50%"
                 sx={{ objectFit: "cover" }}
-              />
+              /> */}
+              <Avatar sx={{ bgcolor: deepPurple[500] ,color:"black" }}>{user.username.charAt(0).toUpperCase()}</Avatar>
             </Button>
             <Box textAlign="left">
               <Typography
                 fontWeight="bold"
                 fontSize="0.8rem"
                 sx={{ color: theme.palette.secondary[100] }}
-              >
-                {user.username}
+              > 
+                {user.First_Name}
               </Typography>
               <Typography
                 fontSize="0.75rem"
@@ -122,16 +126,14 @@ const NavBar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <ArrowDropDownOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "25px" }}
             />
-            
-            {/* Logout dropdown menu */}
-            <Menu
-              anchorEl={anchorEl}
-              open={isOpen}
-              onClose={handleClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-              <MenuItem onClick={logoutHandler}>Log Out</MenuItem>
-            </Menu>
+            <Menu 
+                anchorEl={anchorEl}
+                open={isOpen}
+                onClose={handleClose}
+                anchorOrigin={{vertical:'bottom', horizontal: 'center'}}
+                >
+                  <MenuItem onClick={logoutHandler}>Log Out</MenuItem>
+                  </Menu>
           </FlexBetween>
         </FlexBetween>
       </Toolbar>

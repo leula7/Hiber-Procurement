@@ -14,8 +14,10 @@ const LoginPage = () => {
         backgroundColor={theme.palette.background.default}
         p="1rem 6%"
         textAlign="center"
+        display="flex"
+        justifyContent="center"
       >
-        <FlexBetween marginLeft="30%" color={theme.palette.secondary.default}>
+        <FlexBetween  color={theme.palette.secondary.default}>
                 <Box  justifyContent="space-around" display="flex" alignItems="center" gap="0.5rem">
                   <Box 
                 component="img"
@@ -38,8 +40,8 @@ const LoginPage = () => {
         p="2rem"
         m="2rem auto"
         borderRadius="1.5rem"
-        backgroundColor={theme.palette.background.default} >
-          
+        backgroundColor={theme.palette.background.default}
+      >
         <Typography align="center" fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
           Welcome to Hiber!
         </Typography>

@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {  ApprovedProposal, CatagoryStatus, SetTasks, getEmployees, getnoneFiltered } from '../controller/Director.controller.js';
+import {  ApprovedProposal, CatagoryStatus, SetTasks, getEmployees, getnoneFiltered, proposalCatagroy } from '../controller/Director.controller.js';
 
 const router = Router();
 
@@ -8,6 +8,7 @@ const router = Router();
   router.post('/settasks',SetTasks);
   router.get('/marketofficer',getEmployees);
   router.get('/tasks/:prop_id',CatagoryStatus);
+  router.get('/proposal/catagory/:selectecdProposalId',proposalCatagroy);
 
   export default router;
 

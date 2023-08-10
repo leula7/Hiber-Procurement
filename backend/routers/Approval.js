@@ -6,10 +6,10 @@ const router = Router();
 
   router.get('/proposal',proposal);
 
-  router.get('/proposal/categories/:date',proposalcatagories);
+  router.get('/proposals/details',proposalcatagories);
 
   router.get('/proposal/details/:cat_id/:date',proposaldetail);
   
-  router.put("/approveproposal/:prop_id/:checked_by/:status",ApproveProposal)
+  router.put("/approveproposal",ApproveProposal);
 
   export default router;

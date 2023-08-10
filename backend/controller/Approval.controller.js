@@ -1,13 +1,10 @@
 import sequelize from '../connection/database.js';
 import Proposal from '../model/Approval/Approve.model.js';
 
-
-
   export const proposal = async (req, res) => {
-    const prop = `SELECT * from proposal`;
-
     try {
-      const result= await sequelize.query(prop);
+      const query = 'SELECT * FROM proposal';
+      const result = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
       res.status(200).send(result);
     } catch (error) {
       console.error(error);
@@ -19,81 +16,83 @@ import Proposal from '../model/Approval/Approve.model.js';
 
   export const ApproveProposal = async (req, res) => {
     try {
-          if(req.params.prop_id == null || req.params.checked_by == null ||  req.params.status == null){
-            return;
-          }
-        const prop_id = req.params.prop_id;
-        const checked_by = req.params.user_id;
-        const status = req.params.status;// 0 or 1
-
-        const result = await Proposal.update({
-            checked_by: checked_by,
-            status: status,
+      console.log("jase: ",req.body);
+      const propId = req.body.prop_id;
+      const checkedBy = req.body.user_id;
+      const status = req.body.status; // 0 or 1
+      const result = await Proposal.update(
+        {
+          checked_by: checkedBy,
+          status: status,
+        },
+        {
+          where: {
+            prop_id: propId,
           },
-          {
-            where: {
-              prop_id: prop_id,
-            },
-          });
-          console.log(req.params);
-        if (result[0] > 0) {
-          
-          res.status(200).json({
-            error: '200',
-            message: 'Approve Successfully',
-          });
         }
-        else{
-          res.json({
-            error: '400',
-            message: 'Approve UnSuccessfully',
-          });
-        }
-      } catch (err) {
-        res.json(err);
+      );
+
+      if (result[0] > 0) {
+        res.status(200).json({
+          error: '200',
+          message: 'Approved successfully.',
+        });
+      } else {
+        res.status(400).json({
+          error: '400',
+          message: 'Failed to approve.',
+        });
       }
-  }
-
-  export const proposalcatagories = async(req,res)=>{
-    if(req.params.date == null){
-      return;
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: '500',
+        message: 'Internal server error.',
+      });
     }
-    const date = req.params.date;
-    const proposals = `SELECT cata_Name,cat_id,SUM(tot) as total
-                        FROM (
-                            SELECT c.cata_Name,c.cat_id,(i.price*ar.quantity) as tot
-                            FROM filter_needs fn
-                            LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
-                            LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
-                            LEFT JOIN item i ON i.item_id = ar.item_id
-                            LEFT JOIN catagory c ON c.cat_id = i.cat_id
-                            WHERE YEAR(fn.Date) = YEAR(:dates) AND c.cata_Name IS NOT NULL
-                            
-                            UNION ALL
-                        
-                            SELECT c.cata_Name,c.cat_id,(i.price*rp.quantity) as tot
-                            FROM filter_needs fn
-                            LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
-                            LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
-                            LEFT JOIN item i ON i.item_id = rp.item_id
-                            LEFT JOIN catagory c ON c.cat_id = i.cat_id
-                            WHERE YEAR(fn.Date) = YEAR(:dates)  AND c.cata_Name IS NOT NULL
+  };
 
+  export const proposalcatagories = async (req, res) => {
+    try {
+      const date = req.params.date;
+
+      const proposals = `SELECT cata_Name,cat_id, SUM(tot) as total,prop_id
+                        FROM (
+                          SELECT c.cata_Name, c.cat_id,p.prop_id, (i.price * ar.quantity) as tot
+                          FROM proposal p
+                          left join filter_needs fn on fn.Date = p.date
+                          LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+                          LEFT JOIN additional_request ar ON ar.add_id = ra.req_id
+                          LEFT JOIN item i ON i.item_id = ar.item_id
+                          LEFT JOIN catagory c ON c.cat_id = i.cat_id
+                          WHERE YEAR(fn.Date) = 2023 AND c.cata_Name IS NOT NULL
+
+                          UNION ALL
+
+                          SELECT c.cata_Name, c.cat_id,p.prop_id, (i.price * rp.quantity) as tot
+                          FROM proposal p 
+                          left join filter_needs fn on fn.Date = p.date
+                          LEFT JOIN request_approve ra ON fn.filter_req_app = ra.req_app_id
+                          LEFT JOIN replacement rp ON rp.rep_id = ra.req_id
+                          LEFT JOIN item i ON i.item_id = rp.item_id
+                          LEFT JOIN catagory c ON c.cat_id = i.cat_id
+                          WHERE YEAR(fn.Date) = 2023 AND c.cata_Name IS NOT NULL
                         ) AS subquery
                         GROUP BY subquery.cata_Name`;
-          try {
-            const result= await sequelize.query(proposals,{
-              type: sequelize.QueryTypes.SELECT,
-              replacements: {dates: date}});
-            res.status(200).send(result);
-          } catch (error) {
-            console.error(error);
-            res.status(500).send({
-              message: "Error occurred while fetching proposals"
-            });
-          }
-    }
 
+      const result = await sequelize.query(proposals, {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: { date: date },
+      });
+
+      res.status(200).send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({
+        message: "Error occurred while fetching proposals",
+      });
+    }
+  };
 
   export const proposaldetail = async(req,res)=>{
     
