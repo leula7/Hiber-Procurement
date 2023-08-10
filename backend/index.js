@@ -1,70 +1,105 @@
 import cors from "cors";
-import express, { response } from 'express';
+import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-
+import verifyToken from "./verifyToken.js";
 import MarketOfficer from './routers/MarketOfficer.js';
 import General from './routers/General.js';
 import Assistant from './routers/Assistant.js';
 import BranchManager from './routers/BranchManager.js';
 import Auth from './routers/Auth.js';
+import Admin from './routers/Admin.js'
 import Supplier from './routers/Supplier.js';
 import Chat from './routers/chat.js';
+import Approval from './routers/Approval.js';
+import Director from './routers/Director.js'
+import rateLimit from 'express-rate-limit';
+import slowDown from 'express-slow-down';
+import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config({path: 'connections.env'});
 
 const app = express();
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
 
-app.use(cors());
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  });
 
-app.use(bodyParser.json({limit: '50mb'}));
+  app.use(cors());
 
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+  app.use(bodyParser.json({limit: '50mb'}));
 
-const PORT = process.env.PORT;
+  app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
-app.use((err, req, res, next) => {
-console.log("Use Error: ",err);
-if (err.name === "UnauthorizedError" && err.message === "jwt expired") {
-return res.json({
-"error": "JWT Expired",
-"message": "Your JWT token has expired. Please login again.",
-});
-}
-next(err);
-});
+  const PORT = process.env.PORT;
 
-//General 
-app.use('/', General);
+  app.use((err, req, res, next) => {
+  console.log("Use Error: ",err);
+  if (err.name === "UnauthorizedError" && err.message === "jwt expired") {
+  return res.json({
+  "error": "JWT Expired",
+  "message": "Your JWT token has expired. Please login again.",
+  });
+  }
+  next(err);
+  });
 
-//Chat
-app.use('/', Chat);
+//   const allowedOrigins = ["http://localhost:3000"];
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.includes(origin) || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+// };
 
-//Auth
-app.use('/', Auth);
+// app.use(cors(corsOptions));
 
-//Branch Assistant 
-app.use('/', Assistant);
 
-//Branch Manager
-app.use('/', BranchManager);
 
-//Suplier
-app.use('/', Supplier);
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  app.use(express.static(path.join(__dirname, 'build')));
 
-// Market Officer
-app.use('/', MarketOfficer);
+  app.use('/', General);
 
-app.listen(PORT, () => {
-<<<<<<< HEAD
-  console.log("Connected to backend.",PORT);
-});
-=======
-  console.log("Connected to my backend.",PORT);
-});
->>>>>>> 7b0bc7f34190bf1af84adaa6695845e06ecd431a
+  //Chat
+  app.use('/', Chat);
+
+  //Admin
+  app.use('/', Admin);
+
+  //Aproval 
+  app.use('/',Approval);
+
+  //Director 
+  app.use('/',Director);
+
+  //Auth
+  app.use('/', Auth);
+
+  //Branch Assistant 
+  app.use('/', Assistant);
+
+  //Branch Manager
+  app.use('/', BranchManager);
+
+  //Suplier
+  app.use('/', Supplier);
+
+  // Market Officer
+  app.use('/',MarketOfficer);
+
+  const host = '0.0.0.0';
+
+  app.listen(PORT, () => {
+    console.log("Connected to backend.",PORT);
+  });
