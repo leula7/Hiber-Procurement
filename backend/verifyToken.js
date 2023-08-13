@@ -4,12 +4,12 @@ import { expressjwt } from "express-jwt";
 function verifyToken(req, res, next) {
 
   const authHeader = req.headers.authorization;
-  const secreteKey =process.env.ACCESS_TOKEN_SECRET;
+  const secret =process.env.ACCESS_TOKEN_SECRET;
   const protect= expressjwt({ secret: secret,algorithms: ['HS256'] });
 
   if (authHeader) {
     const token = authHeader.split(' ')[1];
-    Jwt.verify(token, secreteKey, (err, user) => {
+    Jwt.verify(token, secret, (err, user) => {
       if (err) {
         if(err.name === 'TokenExpiredError' && err.message ==='jwt expired'){
           console.log("expired")
