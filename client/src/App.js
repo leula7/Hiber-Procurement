@@ -34,7 +34,6 @@ import ProposalList from "pages/approval/ProposalList";
 import Employee from "pages/Admin/Employee";
 import District from "pages/Admin/District";
 import PdfReader from "components/PdfReader";
-import Branch from "pages/Admin/Branch";
 import BidHistory from "pages/supplier/BidHistory";
 
 
