@@ -1,0 +1,803 @@
+import mysqli from "mysql2/promise";
+import mysql from "mysql";
+import cors from "cors";
+import express from 'express';
+import bodyParser from 'body-parser';
+import md5 from "md5";
+import fs from 'fs';
+import path from "path";
+import multer from "multer";
+import mime from 'mime-types';
+
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "procure",
+});
+const dbConfig = {
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "procure",
+  connectionLimit: 10
+};
+
+const pool = mysqli.createPool(dbConfig);
+
+// Define a function to execute SQL queries
+async function executeQuery(query, params) {
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.query(query, params);
+    
+    return rows;
+  } catch (error) {
+    console.error(error); // log the error to the console
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+app.get('/branch',(req,res)=>{
+  const branch = "select Branch_id,Branch_Name from branch";
+  db.query(branch,(err,result)=>{
+    if(err){
+      res.json(err);
+    }else{
+      res.json(result);
+    }
+  })
+});
+
+app.get('/items',(req,res)=>{
+  const branch = "select *from item";
+  db.query(branch,(err,result)=>{
+    if(err){
+      res.json(err);
+    }else{
+      res.json(result);
+    }
+  })
+});
+
+app.post('/register',async (req, res) => {
+  //get input from user
+  const fname = req.body.fname;
+  const table = req.body.position;
+  const lname = req.body.lname;
+  const branch_id = req.body.branch_id;
+  const username = req.body.username;
+  const password = req.body.password;
+  const tinnumber = req.body.tinnumber;
+  const spec = req.body.spec;
+  const hashedPassword = md5(password);
+
+  //sample sql query
+  var registerQuery = "INSERT INTO ?? VALUES ('', ?, ?,?, ?, ?)";
+  var registerParams = registerParams = [table, branch_id, fname, lname,username, hashedPassword];
+  const result = await executeQuery(registerQuery,registerParams);
+  if (result.affectedRows > 0) {
+    const userDir = path.join('uploads', username);
+    if(table ==='supplier' || table==='marketofficer'){
+    if (fs.existsSync(userDir)) {
+      console.log("Folder Already Exists");
+    } else {
+      fs.mkdir(userDir, (err) => {
+        if (err) {
+          console.error("Error While Creating Folder", err);
+          response("500");
+        } else {
+          console.log("Folder Created Successfully");
+          response("200");
+        }
+      });
+    }
+  } 
+  
+  const registers = (registerQuery,registerParams,response)=>{
+    db.query(registerQuery, registerParams, (err, result) => {
+      if (err) {
+        response("err");
+      } else{
+        if (result.affectedRows > 0) {
+          const userDir = path.join('uploads', username);
+          if(table ==='supplier' || table==='marketofficer'){
+          if (fs.existsSync(userDir)) {
+            console.log("Folder Already Exists");
+          } else {
+            fs.mkdir(userDir, (err) => {
+              if (err) {
+                console.error("Error While Creating Folder", err);
+                response("500");
+              } else {
+                console.log("Folder Created Successfully");
+                response("200");
+              }
+            });
+          }
+        } 
+      }else {
+          response("2001");
+        }
+      }
+    });
+  }
+  //conditions based on tables
+  if(table === "supplier"){
+    registerParams = registerParams = [table,tinnumber, fname, lname,username, hashedPassword];
+    registerQuery = "INSERT INTO ?? VALUES ('', ?, ?,?, ?,?)";
+    registers(registerQuery,registerParams,(result)=>{
+      if(result === "err"){
+        res.status(400).json.strin({
+          "error": "400",
+          "message": "Registration Failed: " + err.message
+        })
+      }
+      if(result === "500"){
+        res.status(500).json({
+          "error": "500",
+          "message": "Internal Server Error"
+        });
+      }
+      if(result === "200"){
+        res.status(200).json({
+          "error": "200",
+          "message": "Registration Successful"
+        });
+      }
+      if(result === "2001"){
+        res.status(200).json({
+          "error": "201",
+          "message": "User Already Registered"
+        });
+      }
+    });
+  }
+  else if(table === "concerned_dep"){
+      registerParams = registerParams = [table, branch_id, fname, lname,spec,username, hashedPassword];
+      registerQuery = "INSERT INTO ?? VALUES ('', ?, ?,?, ?,?,?)";
+      registers(regQuery,registerParams,(result)=>{
+        if(result === "err"){
+          res.status(400).json.strin({
+            "error": "400",
+            "message": "Registration Failed: " + err.message
+          })
+        }
+        if(result === "500"){
+          res.status(500).json({
+            "error": "500",
+            "message": "Internal Server Error"
+          });
+        }
+        if(result === "200"){
+          res.status(200).json({
+            "error": "200",
+            "message": "Registration Successful"
+          });
+        }
+        if(result === "2001"){
+          res.status(200).json({
+            "error": "201",
+            "message": "User Already Registered"
+          });
+        }
+      });
+  }else{
+      registerParams = registerParams = [table, branch_id, fname, lname,username, hashedPassword];
+      registerQuery = "INSERT INTO ?? VALUES ('', ?, ?,?, ?,?)";
+      registers(registerQuery,registerParams,(result)=>{
+        if(result === "err"){
+          res.json({
+            "error": "400",
+            "message": "Registration Failed: "
+          })
+        }
+        if(result === "500"){
+          res.json({
+            "error": "500",
+            "message": "Internal Server Error"
+          });
+        }
+        if(result === "200"){
+          res.status(200).json({
+            "error": "200",
+            "message": "Registration Successful"
+          });
+        }
+        if(result === "2001"){
+          res.status(200).json({
+            "error": "201",
+            "message": "User Already Registered"
+          });
+        }
+      });
+  }
+
+});
+
+app.post('/login', async (req, res)=> {
+  try {
+    const username = req.body.username;
+    const password = req.body.password;
+    const position = req.body.position;
+
+    var primarykey="";
+
+    switch(position){
+      case "supplier":
+        primarykey = "supplier_id";
+        break;
+      case "admin":
+        primarykey = "ad_id";
+        break;
+      case "approvalbody":
+        primarykey = "app_id";
+        break;
+      case "assistant":
+        primarykey = "Assistant_id";
+        break;
+      case "concerned_dep":
+        primarykey = "concerned_id";
+        break;
+      case "manager":
+        primarykey = "man_id";
+        break;
+      case "marketofficer":
+        primarykey = "moId";
+        break;
+    }
+
+    if(!username && !password && !position){
+      res.json({
+        "user": {},
+        "error": "400",
+        "message": "Empty credentials"
+      });
+    }else{
+      const values = [position,username,password];
+      const login = 'SELECT * FROM ?? WHERE username = ? AND password = ?';
+      const results = await executeQuery(login,values);
+      if(results.length >0){
+        const user = {
+          user_id: results[0][primarykey],
+          username: results[0].username,
+        };
+        res.json({
+          ...user,
+          "error": "200",
+          "message": "Login Success"
+        });
+      }else{
+          res.json({
+            "user": {},
+            "error": "400",
+            "message": "Wrong credentials"
+          });
+      }
+    }
+  } catch (error) {
+    
+  }
+   
+
+    //   db.query(login,values,(err,results)=>{
+    //     if(err) throw err;
+    //     if(results.length >0){
+    //       const user = {
+    //         user_id: results[0][primarykey],
+    //         username: results[0].username,
+    //       };
+    //       res.json({
+    //         ...user,
+    //         "error": "200",
+    //         "message": "Login Success"
+    //       });
+    //     }else{
+    //         res.json({
+    //           "user": {},
+    //           "error": "400",
+    //           "message": "Wrong credentials"
+    //         });
+    //     }
+    // });
+});
+
+
+app.get("/post", async (req, res) => {
+  try {
+    
+    const posts = await new Promise((resolve, reject) => {
+      const postQuery = "SELECT * FROM post";
+      db.query(postQuery, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+
+    const postWithUsername = await Promise.all(
+      posts.map(async (post) => {
+        const usernameQuery = "SELECT username FROM user WHERE user_id = ?";
+        const usernameData = await new Promise((resolve, reject) => {
+          db.query(usernameQuery, [post.user_id], (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+        return {
+          ...post,
+          username: usernameData[0]?.username || null,
+        };
+      })
+    );
+
+    res.json(postWithUsername);
+  } catch (err) {
+    console.log(err);
+    res.json(err);
+  }
+});
+
+// app.get("/posts", (req, res) => {
+//   const post = "SELECT * FROM post";
+//   const getusername = "select username from user where user_id = ?";
+//   db.query(post, (err, data) => {
+//     if (err) {
+//       console.log(err);
+//       return res.json(err);
+//     }else{
+//       data.map((result,i)=>{
+//         db.query(getusername,result.user_id,(err,data2)=>{
+//             if(!err){
+//               res.json({data2})
+//             }else{
+//               res.json({err})
+//             }
+//         });
+//       })
+//     }
+//   });
+// });
+
+app.post('/comment', function(req, res) {
+  const post_id = req.body.post_id;
+
+  const comment = 'SELECT * FROM comment WHERE post_id = ?';
+
+  db.query(comment,post_id,(err,comment)=>{
+    if(err) throw err;
+    if(comment.length >0){
+      res.json({
+        comment
+      });
+      console.log(comm)
+    }else{
+        res.json({
+          "user": {},
+          "error": "400",
+          "message": "Wrong credentials"
+        });
+        console.log(results);
+    }
+});
+});
+
+app.post("/likeupdate", (req, res) => {
+  //Uer Inputs
+  const post_id = req.body.post_id;
+  const user_id = req.body.user_id;
+
+  //SQl Query's
+  const isliked = "select is_liked from likes where post_id = ? and user_id = ?"   
+  const getlike = 'select likes from post where post_id= ?';
+  const postlikeUpdate = 'UPDATE post SET likes = ? WHERE post_id = ?';
+  const updateLiker = 'UPDATE likes SET is_liked = ? WHERE post_id = ? and user_id=?';
+  const insertliker = "insert into likes values('',?,?,1)";
+  
+  db.query(isliked,[post_id,user_id],(err,isliked)=>{
+      if(!err){
+        if(isliked.length>0){
+         if(isliked[0].is_liked == 0){
+          getlikes((like)=>{
+            const likes = like+1;
+            updatelike(likes,(result)=>{
+              if(result>0){
+                updateliker(1,(results)=>{
+                  if(results>0){
+                    res.json({message: "Liked"});
+                  }
+              });
+              }
+            })
+          });
+         }else{
+          getlikes((like)=>{
+            const likes = like - 1;
+            updatelike(likes,(result)=>{
+              if(result>0){
+                updateliker(0,(results)=>{
+                    if(results>0){
+                      res.json({message: "Un Liked"});
+                    }
+                });
+              }
+            });
+          });
+         }
+      }else{
+        getlikes((like)=>{
+          const likes = like+1;
+          updatelike(likes,(result)=>{
+            if(result>0){
+              insertlikers((insert)=>{
+                  if(insert>0){
+                    res.json({message: "Liked"});
+                  }
+                });
+            }
+          });
+        });
+      }
+      }
+  });
+
+const insertlikers = (insert)=>{
+  db.query(insertliker,[post_id,user_id],(err,likes)=>{
+    if(!err){
+      if(likes.affectedRows>0){
+        insert(likes.affectedRows);
+      }else{
+        insert(likes.affectedRows);
+      }
+    }else{
+       console.log(err)
+    }
+  });
+}
+
+const updatelike = (likeval,updatelike)=>{
+    db.query(postlikeUpdate,[likeval,post_id],(err,Updatevalue)=>{
+      if(!err){
+        if(Updatevalue.affectedRows > 0){
+          updatelike(Updatevalue.affectedRows);
+      }
+      }else{
+        res.json({message: err});
+      }
+  });
+}
+
+const updateliker = (val,liker)=>{
+  db.query(updateLiker,[val,post_id,user_id],(err,result)=>{
+    if(!err){
+      if(result.affectedRows>0){
+        liker(result.affectedRows);
+      }
+    }
+  });
+}
+
+const getlikes = (likes)=>{
+   db.query(getlike,post_id,(err,likeValue)=>{
+        likeval = likeValue[0].likes;
+        likes(likeval);
+    });
+}
+});
+
+const upload = multer({dest: "./uploads/"});
+
+//Suplier
+app.post("/upload",upload.single("file"),(req,res)=>{
+  //User Inputs
+  const username = req.body.username;
+  const user_id = req.body.user_id;
+  //Organizing File
+  const oldname = req.file.filename;
+  const fileType = mime.extension(req.file.mimetype);
+  const newname = req.file.originalname;
+  const uploadfile = "insert into files values('',?,?,?)";
+  const timestamp = Date.now();
+  const uniqueFilename  = `${newname}_${timestamp}`;
+
+   fs.rename("./uploads/"+oldname,"./uploads/"+username+"/"+newname,()=>{
+      enterData((result)=>{
+        if(result>0){
+          res.json({
+            error: '200',
+            message: 'upload success'});
+        }else{
+          res.json({
+            error: '400',
+            message: 'upload Error'});
+        }
+      });
+   });
+ 
+   const enterData =(pass)=>{
+     db.query(uploadfile,[user_id,uniqueFilename,fileType],(err,result)=>{
+       if(!err){
+        if(result.affectedRows > 0){
+                pass(result.affectedRows);
+              }
+       }else{
+        res.json(err)
+       }
+     });
+   }
+  
+ });
+
+ app.get("/documents", (req, res) => {
+  const usernames = req.query.username;
+
+  // Read the contents of the uploads directory
+  if(usernames){
+    fs.readdir("./uploads/"+usernames, (err, files) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Server error");
+      }
+      // Map the list of files to a list of documents with filename and originalname properties
+      const documents = files.map((filename) => ({
+        filename: filename,
+        originalname: filename.slice(0, -5), // Assuming file extension is 5 characters (e.g. ".docx")
+      }));
+      res.json(documents);
+    });
+  }else{
+    res.json({message: "username Not found"})
+  }
+});
+
+// Route to read the contents of a document
+// app.get("/documents/:username/:filename", (req, res) => {
+//   const filename = req.params.filename;
+//   const username = req.params.username;
+//   const filepath = `./uploads/${username}/${filename}`;
+//   //const ext = path.extname(filename);
+//   const ext = mime.extension(req.file.mimetype);
+//   const contentType = {
+//     '.pdf': 'application/pdf',
+//     '.doc': 'application/msword',
+//     '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+//     '.png': 'application/png',
+//     '.jpg': 'application/jpg'
+//     // add more content types as needed
+//   }[ext];
+  
+//   res.set({
+//     'Content-Disposition': 'inline',
+//     'Content-Type': contentType
+//   });
+//   // Read the contents of the file and send it in the response
+//   fs.readFile(filepath, "binary", (err, data) => {
+//     if (err) {
+//       console.error(err);
+//       return res.status(500).send("Server error");
+//     }else{
+//       res.send(data);
+//     }
+//   });
+// });
+
+
+app.get('/documents/:username/:filename', (req, res) => {
+  const { username, filename } = req.params;
+  const filepath = `./uploads/${username}/${filename}`;
+  const ext = path.extname(filename);
+  const contentType = 'application/pdf'; // set content type to PDF
+
+  res.set({
+    'Content-Disposition': 'inline',
+    'Content-Type': contentType,
+    'Content-Length': fs.statSync(filepath).size // set content length
+  });
+
+  fs.readFile(filepath, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+    res.send(data);
+  });
+});
+
+
+//Assistant
+app.post('/request',async (req, res) => {
+  //get input from user
+  try {
+      const user_id = req.body.Assistant_id;
+      const table = req.body.type;
+      const item_id = req.body.item_id;
+      const quantity = req.body.quantity;
+      const time_of_purchase = req.body.time_of_purchase;
+      const title_of_post = req.body.title_of_post;
+      const other_reason = req.body.other_reason;
+      const bookvalue = req.body.bookvalue;
+      const serviceyear = req.body.serviceyear;
+      const frequency = req.body.frequency;
+      const tagno = req.body.tagno;
+  var requestQuery;
+  const requestParams = [
+    table,
+    user_id,
+    item_id,
+    quantity,
+    time_of_purchase,
+    title_of_post,
+    other_reason,
+    tagno,
+    serviceyear,
+    frequency,
+    bookvalue
+  ];
+
+  if (table === 'replacement') {
+    requestQuery = " INSERT INTO ?? VALUES ('', ?, ?, ?, ?, ?, ?, ?, ?, '')";
+  } else if (table === 'additional_request') 
+  {
+    requestQuery = "INSERT INTO ?? VALUES ('', ?, ?, ?, ?, ?, ?, '') ";
+  } else {
+    throw new Error(`Invalid table type: ${table}`);
+  }
+  
+  const result = await executeQuery(requestQuery, requestParams);
+  const createTriggerQuery = `
+  CREATE TRIGGER ${table}_trigger_${result.insertId}
+  AFTER INSERT ON ${table}
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO request_approve (req_app_id, man_id, req_id, req_status)
+    VALUES ('', '', NEW.rep_id, 'Pending');
+  END;
+`;
+
+    await executeQuery(createTriggerQuery, []);
+    res.status(200).send({
+      message: `Successfully created ${table} request with ID ${result.insertId}`,
+      request_id: result.insertId
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      message: "Error occurred while creating the request"
+    });
+  }
+});
+// app.post('/request', (req, res) => {
+//   //get input from user
+
+//   const user_id = req.body.Assistant_id;
+//   const table = req.body.type;
+//   const item_id = req.body.item_id;
+//   const quantity = req.body.quantity;
+//   const time_of_purchase = req.body.time_of_purchase;
+//   const title_of_post = req.body.title_of_post;
+//   const other_reason = req.body.other_reason;
+//   const bookvalue = req.body.bookvalue;
+//   const serviceyear = req.body.serviceyear;
+//   const frequency = req.body.frequency;
+//   const tagno = req.body.tagno;
+
+//   const createTriggerQuery = "CREATE TRIGGER create_default_order AFTER INSERT ON "+table+" FOR EACH ROW BEGIN INSERT INTO request_approve VALUES ('',NEW.add_id) END";
+// (async () => {
+//   try {
+//     const result = await executeQuery(createTriggerQuery);
+//     console.log('Trigger created successfully: '+result);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// })();
+
+
+//   //sample sql query
+//   var requestQuery = "INSERT INTO ?? VALUES ('', ?,?,?, ?,?,?,'')";
+//   var requestParams = [table, user_id,item_id, quantity, time_of_purchase,title_of_post, other_reason];
+
+
+//   const sendrequest = (requestQuery,requestParams,response)=>{
+//     db.query(requestQuery, requestParams, (err, result) => {
+//       if (err) {
+//         response("err");
+//       } else if(result.affectedRows>0){
+//           res.json(result.affectedRows);
+//         }
+//     });
+//   }
+//   //conditions based on tables
+//   if(table === "replacement"){
+//     requestParams = [table,user_id,item_id, quantity,time_of_purchase, tagno,serviceyear,frequency,bookvalue];
+//     requestQuery = "INSERT INTO ?? VALUES ('', ?,?,?,?,?,?,?,?,'')";
+//     sendrequest(requestQuery,requestParams,(result)=>{
+//       if(result === "err"){
+//         res.json({
+//           "error": "400",
+//           "message": "Registration Failed: "
+//         })
+//       }
+//       if(result === "500"){
+//         res.status(500).json({
+//           "error": "500",
+//           "message": "Internal Server Error"
+//         });
+//       }
+//       if(result === "200"){
+//         res.status(200).json({
+//           "error": "200",
+//           "message": "Registration Successful"
+//         });
+//       }
+//       if(result === "2001"){
+//         res.status(200).json({
+//           "error": "201",
+//           "message": "User Already Registered"
+//         });
+//       }
+//     });
+//   }
+
+//   else if(table === "additional_request"){
+//     requestParams = [table, user_id,item_id, quantity, time_of_purchase,title_of_post, other_reason];
+//     requestQuery = "INSERT INTO ?? VALUES ('', ?,?,?, ?,?,?,'')";
+//     sendrequest(requestQuery,requestParams,(result)=>{
+//         if(result === "err"){
+//           res.json({
+//             "error": "400",
+//             "message": "Send Request Faild "
+//           });
+//         }else if(result>0){
+//           res.json({
+//             "error": "200",
+//             "message": "Request Send wait your manager respond"
+//           });
+//         }
+      
+//       });
+//   }
+// });
+
+app.post("/books", (req, res) => {
+  const q = "INSERT INTO books(`title`, `desc`, `price`, `cover`) VALUES (?)";
+
+  const values = [
+    req.body.title,
+    req.body.desc,
+    req.body.price,
+    req.body.cover,
+  ];
+
+  db.query(q, [values], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
+
+app.delete("/books/:id", (req, res) => {
+  const bookId = req.params.id;
+  const q = " DELETE FROM books WHERE id = ? ";
+
+  db.query(q, [bookId], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
+
+const PORT=process.env.PORT||3000;
+app.listen(PORT, () => {
+  console.log("Connected to backend.",PORT);
+});

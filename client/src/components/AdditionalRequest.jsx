@@ -1,21 +1,27 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, MenuItem, TextField, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useGetItemsQuery } from "state/api";
 
 const AdditionalRequest = ({handler}) => {
+  const theme = useTheme();
     const isNonMobile = useMediaQuery("(min-width:600px)");
+    const {data:items,isLoding} = useGetItemsQuery();
+    console.log(items)
     const initialValues = {
         quantity: "",
         time_of_purchase: "",
         title_of_post: "",
         other_reason: "",
+        item_id:""
       };
       const checkoutSchema = yup.object().shape({
         quantity: yup.string().required("required"),
         time_of_purchase: yup.string().required("required"),
         title_of_post: yup.string().required("required"),
         other_reason: yup.string().required("required"),
+        item_id:yup.number().required("required"),
       });
   return (
     <Formik
@@ -67,6 +73,27 @@ const AdditionalRequest = ({handler}) => {
             helperText={touched.time_of_purchase && errors.time_of_purchase}
             sx={{ gridColumn: "span 5" }}
           />
+          <TextField
+              fullWidth
+              variant="filled"
+              select
+              label="Item ID"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.item_id}
+              name="item_id"
+              error={!!touched.item_id && !!errors.item_id}
+              helperText={touched.item_id && errors.item_id}
+              sx={{ gridColumn: "span 5" }}
+            >
+              {items?.map((item) => (
+                <MenuItem sx={{
+                  color: theme.palette.secondary.light
+                }} key={item.item_id} value={item.item_id}>
+                  {item.item_name}
+                </MenuItem>
+              ))}
+            </TextField>
           <TextField
             fullWidth
             variant="filled"

@@ -1,28 +1,35 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, MenuItem, TextField, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useGetItemsQuery } from "state/api";
 
 
  const ReplacmentRequest = ({handler}) => {
-
+  const theme = useTheme()
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const {data:items,isLoding} = useGetItemsQuery();
 
     const initialValues = {
-  item: "",
-  reason: "",
-  tag: "",
-  service: "",
-  book: "",
+  item_id: "",
+  other_reason: "",
+  time_of_purchase:"",
+  frequency_of_rep:"",
+  tag_no: "",
+  service_year: "",
+  book_value: "",
  
 };
 
 const checkoutSchema = yup.object().shape({
-  item: yup.string().required("required"),
-  reason: yup.string().required("required"),
-  tag: yup.string().required("required"),
-  service: yup.string().required("required"),
-  book: yup.string().required("required"),
+  item_id: yup.number().required("required"),
+  time_of_purchase:yup.number().required("required"),
+  other_reason: yup.string().required("required"),
+  frequency_of_rep:yup.number().required("required"),
+  tag_no: yup.string().required("required"),
+  service_year: yup.number().required("required"),
+  book_value: yup.number().required("required"),
+
 });
 
 
@@ -51,16 +58,37 @@ const checkoutSchema = yup.object().shape({
               }}
             >
               <TextField
+              fullWidth
+              variant="filled"
+              select
+              label="Item ID"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.item_id}
+              name="item_id"
+              error={!!touched.item_id && !!errors.item_id}
+              helperText={touched.item_id && errors.item_id}
+              sx={{ gridColumn: "span 5" }}
+            >
+              {items?.map((item) => (
+                <MenuItem sx={{
+                  color: theme.palette.secondary.light
+                }} key={item.item_id} value={item.item_id}>
+                  {item.item_name}
+                </MenuItem>
+              ))}
+            </TextField>
+               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="item"
+                type="number"
+                label="Frequency of replacment"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.item}
-                name="item"
-                error={!!touched.item && !!errors.item}
-                helperText={touched.item && errors.item}
+                value={values.frequency_of_rep}
+                name="frequency_of_rep"
+                error={!!touched.frequency_of_rep && !!errors.frequency_of_rep}
+                helperText={touched.frequency_of_rep && errors.frequency_of_rep}
                 sx={{ gridColumn: "span 5" }}
               />
               <TextField
@@ -70,25 +98,51 @@ const checkoutSchema = yup.object().shape({
                 label="reason"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.reason}
-                name="reason"
-                error={!!touched.reason && !!errors.reason}
-                helperText={touched.reason && errors.reason}
+                value={values.other_reason}
+                name="other_reason"
+                error={!!touched.other_reason && !!errors.other_reason}
+                helperText={touched.other_reason && errors.other_reason}
                 sx={{ gridColumn: "span 5" }}
               />
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="tag number"
+                type="number"
+                label="time of purchase"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.tag}
-                name="tag"
-                error={!!touched.tag && !!errors.tag}
-                helperText={touched.tag && errors.tag}
+                value={values.time_of_purchase}
+                name="time_of_purchase"
+                error={!!touched.time_of_purchase && !!errors.time_of_purchase}
+                helperText={touched.time_of_purchase && errors.time_of_purchase}
                 sx={{ gridColumn: "span 5" }}
               />
+                <TextField
+            fullWidth
+            variant="filled"
+            type="text"
+            label="title of post"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={values.title_of_post}
+            name="title_of_post"
+            error={!!touched.title_of_post && !!errors.title_of_post}
+            helperText={touched.title_of_post && errors.title_of_post}
+            sx={{ gridColumn: "span 5" }}
+          />
+                <TextField
+            fullWidth
+            variant="filled"
+            type="text"
+            label="Tag no"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={values.tag_no}
+            name="tag_no"
+            error={!!touched.tag_no && !!errors.tag_no}
+            helperText={touched.tag_no && errors.tag_no}
+            sx={{ gridColumn: "span 5" }}
+          />
                 <TextField
                 fullWidth
                 variant="filled"
@@ -96,10 +150,10 @@ const checkoutSchema = yup.object().shape({
                 label="service year"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.service}
-                name="service"
-                error={!!touched.service && !!errors.service}
-                helperText={touched.service && errors.service}
+                value={values.service_year}
+                name="service_year"
+                error={!!touched.service_year && !!errors.service_year}
+                helperText={touched.service_year && errors.service_year}
                 sx={{ gridColumn: "span 5" }}
               />
               <TextField
@@ -109,13 +163,13 @@ const checkoutSchema = yup.object().shape({
                 label="book value"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.book}
-                name="book"
-                error={!!touched.book && !!errors.book}
-                helperText={touched.book && errors.book}
+                value={values.book_value}
+                name="book_value"
+                error={!!touched.book_value && !!errors.book_value}
+                helperText={touched.book_value && errors.book_value}
                 sx={{ gridColumn: "span 5" }}
               />
-             
+               
             </Box>
             <Box display="flex" justifyContent="end" mt="20px" gap="1rem">
             <Button  color="secondary" variant="contained"  >

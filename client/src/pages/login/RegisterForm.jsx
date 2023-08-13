@@ -1,32 +1,38 @@
+import { EditOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
   TextField,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 
-
-
 const registerSchema = yup.object().shape({
-  fname: yup.string().required("required"),
-  lname: yup.string().required("required"),
+  First_Name: yup.string().required("required"),
+  Last_Name: yup.string().required("required"),
   username: yup.string().required("required"),
+  tin_number: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
-  branch_id: yup.string().required("required"),
-  position: yup.string().required("required"),
+  password:yup
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+  )
+  .required('Password is required'),
 });
 const initialValuesRegister = {
-  fname: "",
-  lname: "",
+  First_Name: "",
+  Last_Name: "",
   username: "",
   password: "",
   email:"",
-  position: "",
-  branch_id: ""
+  tin_number:""
+
 };
 
 const RegisterForm = ( {handleFormSubmit}) => {
@@ -36,10 +42,10 @@ const RegisterForm = ( {handleFormSubmit}) => {
 
     return(
             <Formik
-      onSubmit={handleFormSubmit}
-      initialValues={ initialValuesRegister}
-      validationSchema={ registerSchema}
-    >
+        onSubmit={handleFormSubmit}
+        initialValues={ initialValuesRegister}
+        validationSchema={ registerSchema}
+      >
       {({
         values,
         errors,
@@ -63,22 +69,22 @@ const RegisterForm = ( {handleFormSubmit}) => {
                   label="First Name"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.firstName}
-                  name="fname"
+                  value={values.First_Name}
+                  name="First_Name"
                   error={
-                    Boolean(touched.fname) && Boolean(errors.fname)
+                    Boolean(touched.First_Name) && Boolean(errors.First_Name)
                   }
-                  helperText={touched.fname && errors.fname}
+                  helperText={touched.First_Name && errors.First_Name}
                   sx={{ gridColumn: "span 2" }}
                 />
                 <TextField
                   label="Last Name"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.lname}
-                  name="lname"
-                  error={Boolean(touched.lname) && Boolean(errors.lname)}
-                  helperText={touched.lname && errors.lname}
+                  value={values.Last_Name}
+                  name="Last_Name"
+                  error={Boolean(touched.Last_Name) && Boolean(errors.Last_Name)}
+                  helperText={touched.Last_Name && errors.Last_Name}
                   sx={{ gridColumn: "span 2" }}
                 />
                 <TextField
@@ -91,30 +97,7 @@ const RegisterForm = ( {handleFormSubmit}) => {
                   helperText={touched.username && errors.username}
                   sx={{ gridColumn: "span 4" }}
                 />
-                <TextField
-                  label="position"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.position}
-                  name="position"
-                  error={
-                    Boolean(touched.position) && Boolean(errors.position)
-                  }
-                  helperText={touched.position && errors.position}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  label="branch id"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.branch_id}
-                  name="branch_id"
-                  error={
-                    Boolean(touched.branch_id) && Boolean(errors.branch_id)
-                  }
-                  helperText={touched.branch_id && errors.branch_id}
-                  sx={{ gridColumn: "span 4" }}
-                />
+               
                 <Box
                   gridColumn="span 4"
                   border={`1px solid ${palette.neutral.medium}`}
@@ -141,12 +124,13 @@ const RegisterForm = ( {handleFormSubmit}) => {
                         ) : (
                           <FlexBetween>
                             <Typography>{values.picture.name}</Typography>
-                            <EditOutlinedIcon />
+                            <EditOutlined />
                           </FlexBetween>
                         )}
                       </Box>
                     )}
                   </Dropzone> */}
+                  
                 </Box>
             <TextField
               label="Email"
@@ -156,6 +140,16 @@ const RegisterForm = ( {handleFormSubmit}) => {
               name="email"
               error={Boolean(touched.email) && Boolean(errors.email)}
               helperText={touched.email && errors.email}
+              sx={{ gridColumn: "span 4" }}
+            />
+             <TextField
+              label="Tin Number"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.tin_number}
+              name="tin_number"
+              error={Boolean(touched.tin_number) && Boolean(errors.tin_number)}
+              helperText={touched.tin_number && errors.tin_number}
               sx={{ gridColumn: "span 4" }}
             />
             <TextField

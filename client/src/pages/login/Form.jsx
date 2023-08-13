@@ -38,19 +38,22 @@ const Form = () => {
     try {
       console.log(values)
       const result = await login(values);
-      const loggedInUser = result.data; // Retrieve the data property
-      if (loggedInUser) {
-        toast.success('Login successful!');
+      const loggedInUser = result.data;
+      console.log(loggedInUser) // Retrieve the data property
+      if (loggedInUser.error === '200') {
+        toast.success(loggedInUser.message)
         dispatch( setLogin({
           user: loggedInUser,
           token: loggedInUser.token,
         }))
         navigate('/');
-      } else {
-        toast.error('Invalid username or password!');
+      } else if (loggedInUser.error === '400') {
+        toast.error(loggedInUser.message)
       }
+      
     } catch (error) {
-      // console.error('Login failed:', error.message);
+      
+      // console.error('Login failed:', ge);
       // if (error) {
       //   toast.error('Invalid username or password!');
       // } else if (error.response && error.response.status === 501) {
@@ -63,9 +66,12 @@ const Form = () => {
   const handleregister = async (values, onSubmitProps) => {
     try {
       console.log(`values  ${values}`)
+      values.position="supplier"
       const result = await register(values);
+
+      console.log(result)
       const registered = result.data; // Retrieve the data property
-      if (registered) {
+      if (registered.error === '200') {
         toast.success('Registered successfully!');
        // onSubmitProps.resetForm();
         setPageType("login");
@@ -97,7 +103,7 @@ const Form = () => {
               }}
               sx={{
                 textDecoration: "underline",
-                color: palette.primary.main,
+               
                 "&:hover": {
                   cursor: "pointer",
                   color: palette.primary.light,

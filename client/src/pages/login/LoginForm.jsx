@@ -81,7 +81,7 @@ const initialValuesLogin = {
                   m: "2rem 0",
                   p: "1rem",
                   backgroundColor: palette.secondary.main,
-                  "&:hover": { color: palette.primary.main },
+                  "&:hover": { color: palette.primary.dark,backgroundColor: palette.secondary.dark},
                 }}
               >
                 Login

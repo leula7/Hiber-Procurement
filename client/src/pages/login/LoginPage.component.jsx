@@ -14,8 +14,10 @@ const LoginPage = () => {
         backgroundColor={theme.palette.background.default}
         p="1rem 6%"
         textAlign="center"
+        display="flex"
+        justifyContent="center"
       >
-        <FlexBetween marginLeft="30%" color={theme.palette.secondary.default}>
+        <FlexBetween  color={theme.palette.secondary.default}>
                 <Box  justifyContent="space-around" display="flex" alignItems="center" gap="0.5rem">
                   <Box 
                 component="img"
