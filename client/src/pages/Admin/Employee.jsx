@@ -19,10 +19,7 @@ const Employee = () => {
     const [selectedRow, setSelectedRow] = useState(null);
     const [DirectorRequestStatus ,{isLoading,isError}] = useDirectorRequestStatusMutation();
     const id = useSelector((state) => state.auth.user.user_id);
-<<<<<<< HEAD
-=======
     const token = useSelector((state) => state.auth.user.token);
->>>>>>> remove
     const {data } = useGetEmployeeQuery();
     const [InsertEmployee ] = useInsertEmployeeMutation();
     // const resultArray = data?.result || [];
@@ -31,10 +28,7 @@ const Employee = () => {
     const AddClick = ()=>{
         setOpenForm(true);
     }
-<<<<<<< HEAD
-=======
     
->>>>>>> remove
     const handleSubmit = async (values, onSubmitProps) => {
         try {
           console.log(values)
@@ -66,18 +60,11 @@ const Employee = () => {
         setSelectedRow(params.row);
         setOpen(true);
       };
-<<<<<<< HEAD
-      const handleAccept = async () => {
-        const filter_req_app=  selectedRow.req_app_id;
-        const values = { filter_req_app:filter_req_app,
-                       user_id: id}
-=======
 
       const handleAccept = async () => {
         const filter_req_app=  selectedRow.req_app_id;
         const values = { filter_req_app:filter_req_app,
                        user_id: id,token: token}
->>>>>>> remove
         console.log(values)
        const result= await DirectorRequestStatus(values);
        console.log(result)
